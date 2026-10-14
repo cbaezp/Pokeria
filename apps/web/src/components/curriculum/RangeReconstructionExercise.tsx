@@ -21,6 +21,7 @@ import {
   BTN_PRESET_HANDS,
   POSITION_DATA,
   POSITION_ORDER,
+  type Position,
   UTG_PRESET_HANDS,
 } from "./rangeBenchmarks";
 
@@ -32,7 +33,7 @@ export type ReconstructionMode =
 
 export interface RangeReconstructionExerciseProps {
   initialMode?: ReconstructionMode;
-  position?: "UTG" | "HJ" | "CO" | "BTN" | "SB";
+  position?: Position;
   className?: string;
   onEvaluationComplete?: (scorePct: number, metrics: Record<string, unknown>) => void;
 }
@@ -44,11 +45,8 @@ export const RangeReconstructionExercise: React.FC<RangeReconstructionExercisePr
   onEvaluationComplete,
 }) => {
   const [mode, setMode] = useState<ReconstructionMode>(initialMode);
-  const [selectedPos, setSelectedPos] = useState<"UTG" | "HJ" | "CO" | "BTN" | "SB">(position);
+  const [selectedPos, setSelectedPos] = useState<Position>(position);
   const [markedHands, setMarkedHands] = useState<Set<string>>(new Set());
-  const [frequencyAssignments, setFrequencyAssignments] = useState<
-    Record<string, "RAISE" | "MIXED" | "FOLD">
-  >({});
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [strategyMode, setStrategyMode] = useState<RangeStrategyMode>("STANDARD");
   const [strategyThreshold, setStrategyThreshold] = useState<number>(0.5);
@@ -79,7 +77,6 @@ export const RangeReconstructionExercise: React.FC<RangeReconstructionExercisePr
 
   const handleClear = () => {
     setMarkedHands(new Set());
-    setFrequencyAssignments({});
     setIsSubmitted(false);
   };
 

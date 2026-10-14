@@ -99,6 +99,80 @@ _UTG_RAISE_COMBOS: dict[str, float] = {
     "65s": 0.2,
 }
 
+# UTG+1 (Full-Ring Early Position 2): 39 hand classes, ~175.2 weighted combos (13.2% of 1,326 combos)
+_UTG1_RAISE_COMBOS: dict[str, float] = {
+    **_UTG_RAISE_COMBOS,
+    "66": 0.8,
+    "55": 0.4,
+    "A5s": 0.8,
+    "A4s": 0.7,
+    "A3s": 0.4,
+    "AJo": 1.0,
+    "ATo": 0.4,
+    "KQo": 1.0,
+    "KJo": 0.3,
+    "K9s": 0.4,
+    "Q9s": 0.3,
+    "J9s": 0.3,
+    "T9s": 1.0,
+    "98s": 1.0,
+    "87s": 0.7,
+    "76s": 0.5,
+    "65s": 0.3,
+}
+
+# UTG+2 (Full-Ring Early Position 3 / MP1): 44 hand classes, ~198.8 weighted combos (15.0% of 1,326 combos)
+_UTG2_RAISE_COMBOS: dict[str, float] = {
+    **_UTG1_RAISE_COMBOS,
+    "66": 1.0,
+    "55": 0.6,
+    "44": 0.3,
+    "A9s": 0.8,
+    "A8s": 0.4,
+    "A5s": 1.0,
+    "A4s": 0.9,
+    "A3s": 0.5,
+    "A2s": 0.3,
+    "ATo": 0.6,
+    "A9o": 0.1,
+    "K9s": 0.6,
+    "Q9s": 0.5,
+    "J9s": 0.5,
+    "T8s": 0.3,
+    "KJo": 0.5,
+    "QJo": 0.3,
+    "87s": 0.9,
+    "76s": 0.6,
+    "65s": 0.5,
+    "54s": 0.2,
+}
+
+# LJ (Lojack / Full-Ring MP2): 47 hand classes, ~216.4 weighted combos (16.3% of 1,326 combos)
+_LJ_RAISE_COMBOS: dict[str, float] = {
+    **_UTG2_RAISE_COMBOS,
+    "55": 0.8,
+    "44": 0.4,
+    "33": 0.2,
+    "A9s": 1.0,
+    "A8s": 0.6,
+    "A7s": 0.3,
+    "A6s": 0.2,
+    "A4s": 1.0,
+    "A3s": 0.6,
+    "A2s": 0.4,
+    "ATo": 0.7,
+    "K9s": 0.7,
+    "Q9s": 0.6,
+    "J9s": 0.7,
+    "T8s": 0.5,
+    "KJo": 0.6,
+    "QJo": 0.4,
+    "87s": 1.0,
+    "76s": 0.7,
+    "65s": 0.6,
+    "54s": 0.3,
+}
+
 # HJ (Middle Position): 49 hand classes, 230.8 weighted combos (17.4% of 1,326 combos)
 _HJ_RAISE_COMBOS: dict[str, float] = {
     **_UTG_RAISE_COMBOS,
@@ -476,6 +550,11 @@ _MTT_15BB_NASH_SHOVE: dict[str, float] = {
 
 _POSITION_CHARTS: dict[str, dict[str, float]] = {
     "UTG": _UTG_RAISE_COMBOS,
+    "UTG+1": _UTG1_RAISE_COMBOS,
+    "UTG1": _UTG1_RAISE_COMBOS,
+    "UTG+2": _UTG2_RAISE_COMBOS,
+    "UTG2": _UTG2_RAISE_COMBOS,
+    "LJ": _LJ_RAISE_COMBOS,
     "MP": _HJ_RAISE_COMBOS,
     "HJ": _HJ_RAISE_COMBOS,
     "CO": _CO_RAISE_COMBOS,
@@ -526,8 +605,12 @@ class PreflopReferenceProvider:
     @classmethod
     def get_rfi_action(cls, position: str, card1: str, card2: str) -> PreflopHandAction:
         """Lookup open-raise frequency for a specific hand and position."""
-        pos = position.upper().strip()
-        if pos == "HJ":
+        pos = position.upper().strip().replace(" ", "")
+        if pos == "UTG1":
+            pos = "UTG+1"
+        elif pos == "UTG2":
+            pos = "UTG+2"
+        elif pos == "HJ":
             pos = "MP"
         if pos not in _POSITION_CHARTS:
             raise ValueError(
@@ -556,7 +639,7 @@ class PreflopReferenceProvider:
         hand_class: str,
     ) -> dict[str, float]:
         """Fetch exact reference frequencies across all available actions for a hand class."""
-        pos = position.upper().strip()
+        pos = position.upper().strip().replace(" ", "")
         ref = reference_id.upper().strip()
 
         # Multi-Action Small Blind Limp / Raise / Fold
@@ -592,8 +675,12 @@ class PreflopReferenceProvider:
             r_freq = chart.get(hand_class, 0.0)
             return {"RAISE": r_freq, "FOLD": round(1.0 - r_freq, 4)}
 
-        # Default: Cash 6-Max RFI
-        if pos == "HJ":
+        # Default: Cash RFI (supports 6-max, 8-max, 9-max full ring)
+        if pos == "UTG1":
+            pos = "UTG+1"
+        elif pos == "UTG2":
+            pos = "UTG+2"
+        elif pos == "HJ":
             pos = "MP"
         chart = _POSITION_CHARTS.get(pos, _UTG_RAISE_COMBOS)
         r_freq = chart.get(hand_class, 0.0)
@@ -683,4 +770,4 @@ class PreflopReferenceProvider:
 
     @classmethod
     def get_supported_positions(cls) -> list[str]:
-        return list(_POSITION_CHARTS.keys())
+        return ["UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB"]

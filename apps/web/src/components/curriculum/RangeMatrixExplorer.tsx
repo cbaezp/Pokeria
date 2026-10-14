@@ -4,6 +4,7 @@ import { Check, Eye, Grid, Info, Layers, Sliders, Sparkles, X } from "lucide-rea
 import type React from "react";
 import { useState } from "react";
 import { StrategyModeSelector } from "@/components/training/StrategyModeSelector";
+import { useOptionalGameConfiguration } from "@/lib/game-configuration-context";
 import type { RangeStrategyMode } from "@/types";
 import { PreflopProvenanceDisclosure } from "./PreflopProvenanceDisclosure";
 import { RangePositionComparison } from "./RangePositionComparison";
@@ -11,24 +12,38 @@ import {
   BTN_PRESET_HANDS,
   CO_PRESET_HANDS,
   HJ_PRESET_HANDS,
+  LJ_PRESET_HANDS,
+  NINE_MAX_POSITIONS,
   POSITION_DATA,
   POSITION_ORDER,
   type Position,
   SB_PRESET_HANDS,
+  SIX_MAX_POSITIONS,
   UTG_PRESET_HANDS,
+  UTG1_PRESET_HANDS,
+  UTG2_PRESET_HANDS,
 } from "./rangeBenchmarks";
 
 export const RANKS = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"] as const;
 
 // Re-export for backward compatibility
-export { BTN_PRESET_HANDS, CO_PRESET_HANDS, HJ_PRESET_HANDS, SB_PRESET_HANDS, UTG_PRESET_HANDS };
+export {
+  BTN_PRESET_HANDS,
+  CO_PRESET_HANDS,
+  HJ_PRESET_HANDS,
+  LJ_PRESET_HANDS,
+  SB_PRESET_HANDS,
+  UTG_PRESET_HANDS,
+  UTG1_PRESET_HANDS,
+  UTG2_PRESET_HANDS,
+};
 
 export interface RangeMatrixExplorerProps {
   interactive?: boolean;
   highlightPairs?: boolean;
   highlightSuited?: boolean;
   highlightOffsuit?: boolean;
-  presetRange?: "NONE" | "UTG" | "HJ" | "CO" | "BTN" | "SB" | "UTG_VS_BTN" | "COMPARE";
+  presetRange?: "NONE" | Position | "UTG_VS_BTN" | "COMPARE";
   initialMode?: RangeStrategyMode;
   initialThreshold?: number;
   onCellClick?: (hand: string, type: "pair" | "suited" | "offsuit") => void;
@@ -50,11 +65,29 @@ export const RangeMatrixExplorer: React.FC<RangeMatrixExplorerProps> = ({
   const [activeFilter, setActiveFilter] = useState<"ALL" | "PAIRS" | "SUITED" | "OFFSUIT">(
     highlightPairs ? "PAIRS" : highlightSuited ? "SUITED" : highlightOffsuit ? "OFFSUIT" : "ALL",
   );
-  const [activePreset, setActivePreset] = useState<
-    "NONE" | "UTG" | "HJ" | "CO" | "BTN" | "SB" | "UTG_VS_BTN" | "COMPARE"
-  >(presetRange);
+  const [activePreset, setActivePreset] = useState<"NONE" | Position | "UTG_VS_BTN" | "COMPARE">(
+    presetRange,
+  );
+  const [tableFormatMode, setTableFormatMode] = useState<"CONFIG" | "6-MAX" | "9-MAX">("CONFIG");
   const [strategyMode, setStrategyMode] = useState<RangeStrategyMode>(initialMode);
   const [strategyThreshold, setStrategyThreshold] = useState<number>(initialThreshold);
+
+  const configCtx = useOptionalGameConfiguration();
+
+  const activeConfigPositions = configCtx?.activeConfiguration?.positions
+    ? (configCtx.activeConfiguration.positions.filter(
+        (p) => p !== "BB" && p in POSITION_DATA,
+      ) as Position[])
+    : null;
+
+  const effectivePositions =
+    tableFormatMode === "6-MAX"
+      ? SIX_MAX_POSITIONS
+      : tableFormatMode === "9-MAX"
+        ? NINE_MAX_POSITIONS
+        : activeConfigPositions && activeConfigPositions.length > 0
+          ? activeConfigPositions
+          : NINE_MAX_POSITIONS;
 
   const getHandData = (rowIdx: number, colIdx: number) => {
     const r1 = RANKS[rowIdx];
@@ -111,10 +144,41 @@ export const RangeMatrixExplorer: React.FC<RangeMatrixExplorerProps> = ({
           solidClass: "bg-emerald-600",
           hoverClass: "hover:bg-emerald-500",
         },
-        HJ: { rgb: "20, 184, 166", solidClass: "bg-teal-600", hoverClass: "hover:bg-teal-500" },
-        CO: { rgb: "99, 102, 241", solidClass: "bg-indigo-600", hoverClass: "hover:bg-indigo-500" },
-        BTN: { rgb: "14, 165, 233", solidClass: "bg-sky-600", hoverClass: "hover:bg-sky-500" },
-        SB: { rgb: "168, 85, 247", solidClass: "bg-purple-600", hoverClass: "hover:bg-purple-500" },
+        "UTG+1": {
+          rgb: "20, 184, 166",
+          solidClass: "bg-teal-600",
+          hoverClass: "hover:bg-teal-500",
+        },
+        "UTG+2": {
+          rgb: "6, 182, 212",
+          solidClass: "bg-cyan-600",
+          hoverClass: "hover:bg-cyan-500",
+        },
+        LJ: {
+          rgb: "59, 130, 246",
+          solidClass: "bg-blue-600",
+          hoverClass: "hover:bg-blue-500",
+        },
+        HJ: {
+          rgb: "99, 102, 241",
+          solidClass: "bg-indigo-600",
+          hoverClass: "hover:bg-indigo-500",
+        },
+        CO: {
+          rgb: "139, 92, 246",
+          solidClass: "bg-violet-600",
+          hoverClass: "hover:bg-violet-500",
+        },
+        BTN: {
+          rgb: "14, 165, 233",
+          solidClass: "bg-sky-600",
+          hoverClass: "hover:bg-sky-500",
+        },
+        SB: {
+          rgb: "217, 70, 239",
+          solidClass: "bg-purple-600",
+          hoverClass: "hover:bg-purple-500",
+        },
       };
       const c = colorMap[posData.position];
 
@@ -323,12 +387,13 @@ export const RangeMatrixExplorer: React.FC<RangeMatrixExplorerProps> = ({
         )}
 
         {/* Position Selectors */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 w-full">
           {/* Position Range Selector Buttons */}
           <div className="flex flex-wrap items-center gap-1">
             <span className="text-slate-400 font-semibold mr-1">Ranges:</span>
-            {POSITION_ORDER.map((pos) => {
+            {effectivePositions.map((pos) => {
               const d = POSITION_DATA[pos];
+              if (!d) return null;
               const isSelected = activePreset === pos;
               return (
                 <button
@@ -352,6 +417,33 @@ export const RangeMatrixExplorer: React.FC<RangeMatrixExplorerProps> = ({
             >
               <Layers className="w-3 h-3" />
               Compare Seats
+            </button>
+          </div>
+
+          {/* Table Capacity Switcher (6 Chairs vs 9 Chairs) */}
+          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-[10px] font-mono">
+            <button
+              type="button"
+              onClick={() => setTableFormatMode("6-MAX")}
+              className={`px-2 py-0.5 rounded font-bold transition-colors ${
+                tableFormatMode === "6-MAX"
+                  ? "bg-emerald-600 text-white shadow-sm"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              6 Chairs
+            </button>
+            <button
+              type="button"
+              onClick={() => setTableFormatMode("9-MAX")}
+              className={`px-2 py-0.5 rounded font-bold transition-colors ${
+                tableFormatMode === "9-MAX" ||
+                (tableFormatMode === "CONFIG" && effectivePositions.length > 5)
+                  ? "bg-emerald-600 text-white shadow-sm"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              9 Chairs
             </button>
           </div>
         </div>

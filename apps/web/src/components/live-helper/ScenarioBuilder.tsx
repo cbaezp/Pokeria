@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, DollarSign, Settings2, Sparkles, Trophy } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import type { LiveHelperConfig, LiveHelperSeat, LiveHelperTemplate } from "@/types";
 
 interface ScenarioBuilderProps {
@@ -14,27 +14,45 @@ interface ScenarioBuilderProps {
 }
 
 export function ScenarioBuilder({
-  config,
-  seats,
-  templates,
-  onUpdateConfig,
-  onUpdateSeatCount,
-  onApplyTemplate,
-}: ScenarioBuilderProps) {
+  config = {
+    format_type: "CASH",
+    table_capacity: 6,
+    small_blind: 100,
+    big_blind: 200,
+    ante: 0,
+    ante_type: "NONE",
+  } as LiveHelperConfig,
+  seats = [],
+  templates = [],
+  onUpdateConfig = () => {},
+  onUpdateSeatCount = () => {},
+  onApplyTemplate = () => {},
+}: Partial<ScenarioBuilderProps>) {
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
 
   const categories = [
     { id: "ALL", label: "All Templates" },
-    { id: "PREFLOP_OPEN", label: "Open & RFI" },
-    { id: "PREFLOP_DEFENSE", label: "Blind Defense" },
-    { id: "3BET_4BET_SQUEEZE", label: "3-Bet / 4-Bet / Squeeze" },
-    { id: "ALL_IN_SHOVE", label: "All-In & Shove" },
-    { id: "POSTFLOP_TEXTURES", label: "Postflop Textures" },
-    { id: "TOURNAMENT_ICM_PKO", label: "ICM & PKO Bounties" },
+    { id: "PREFLOP_RFI", aliases: ["PREFLOP_OPEN", "PREFLOP_RFI"], label: "Open & RFI" },
+    { id: "PREFLOP_DEFENSE", aliases: ["PREFLOP_DEFENSE"], label: "Blind Defense" },
+    {
+      id: "PREFLOP_AGGRESSION",
+      aliases: ["3BET_4BET_SQUEEZE", "PREFLOP_AGGRESSION"],
+      label: "3-Bet / 4-Bet / Squeeze",
+    },
+    { id: "POSTFLOP", aliases: ["POSTFLOP", "POSTFLOP_TEXTURES"], label: "Postflop Textures" },
+    {
+      id: "TOURNAMENT",
+      aliases: ["TOURNAMENT", "TOURNAMENT_ICM_PKO", "ALL_IN_SHOVE"],
+      label: "Tournament & ICM",
+    },
   ];
 
   const filteredTemplates = templates.filter((t) => {
     if (selectedCategory === "ALL") return true;
+    const cat = categories.find((c) => c.id === selectedCategory);
+    if (cat?.aliases) {
+      return cat.aliases.includes(t.category);
+    }
     return t.category === selectedCategory;
   });
 
@@ -79,32 +97,38 @@ export function ScenarioBuilder({
 
         {/* Templates Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {filteredTemplates.map((tmpl) => (
-            <div
-              key={tmpl.template_id}
-              onClick={() => onApplyTemplate(tmpl)}
-              className="group p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-800/40 cursor-pointer transition-all flex flex-col justify-between gap-2 shadow-sm"
-            >
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-200 group-hover:text-emerald-400 transition-colors">
-                    {tmpl.title}
-                  </span>
-                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 uppercase">
-                    {tmpl.configuration.format_type}
+          {filteredTemplates.map((tmpl, idx) => {
+            const tmplId = tmpl.template_id || tmpl.id || `tmpl-${idx}`;
+            const formatType =
+              tmpl.configuration?.format_type || tmpl.config?.format_type || "CASH";
+            const desc = tmpl.description || tmpl.summary || "";
+            return (
+              <div
+                key={tmplId}
+                onClick={() => onApplyTemplate(tmpl)}
+                className="group p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-800/40 cursor-pointer transition-all flex flex-col justify-between gap-2 shadow-sm"
+              >
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-200 group-hover:text-emerald-400 transition-colors">
+                      {tmpl.title}
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 uppercase">
+                      {formatType}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-400 line-clamp-2">{desc}</p>
+                </div>
+
+                <div className="flex items-center justify-between border-t border-slate-800/80 pt-2 text-[10px] text-slate-400">
+                  <span className="font-mono">Hero: {tmpl.hero_cards?.join(" ") || "Unknown"}</span>
+                  <span className="flex items-center gap-1 text-emerald-400 font-semibold group-hover:translate-x-0.5 transition-transform">
+                    Load Spot <ArrowRight className="w-3 h-3" />
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 line-clamp-2">{tmpl.description}</p>
               </div>
-
-              <div className="flex items-center justify-between border-t border-slate-800/80 pt-2 text-[10px] text-slate-400">
-                <span className="font-mono">Hero: {tmpl.hero_cards?.join(" ") || "Unknown"}</span>
-                <span className="flex items-center gap-1 text-emerald-400 font-semibold group-hover:translate-x-0.5 transition-transform">
-                  Load Spot <ArrowRight className="w-3 h-3" />
-                </span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -323,7 +347,7 @@ export function ScenarioBuilder({
                     const parsed = e.target.value
                       .split(",")
                       .map((s) => parseFloat(s.trim()))
-                      .filter((n) => !isNaN(n) && n > 0);
+                      .filter((n) => !Number.isNaN(n) && n > 0);
                     onUpdateConfig({
                       tournament_rules: {
                         ...config.tournament_rules,

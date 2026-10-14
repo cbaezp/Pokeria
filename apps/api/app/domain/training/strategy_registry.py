@@ -318,6 +318,24 @@ REF_FULLRING_9MAX_100BB = StrategyReferenceRecord(
     description="Full-ring live cash RFI accounting for extra ep positions and larger live opening sizings.",
 )
 
+REF_ILLUSTRATIVE_100BB_9MAX_RFI = StrategyReferenceRecord(
+    id="ILLUSTRATIVE_PRACTICE_CHART_100BB_9MAX",
+    version="1.1.0",
+    name="9-Max Full-Ring 100bb Cash RFI Instructional Benchmark",
+    configuration_id="online_cash_9max_100bb",
+    source_type=ReferenceSourceType.ILLUSTRATIVE_EDUCATIONAL,
+    validation_status=ValidationStatus.AUDITED_HEURISTIC,
+    grading_permission=GradingPermission.FREQUENCY_ALIGNMENT,
+    provenance="Curated instructional full-ring 100bb cash opening range benchmark covering UTG, UTG+1, UTG+2, LJ, HJ, CO, BTN, SB.",
+    game_context="CASH",
+    table_format="9-max",
+    effective_stack_bb=100.0,
+    available_actions=["fold", "raise"],
+    has_action_evs=False,
+    supported_modes=["STANDARD", "SIMPLIFIED", "CUSTOM"],
+    description="Full-ring 9-max opening ranges with tighter early position thresholds across all 9 seats.",
+)
+
 # ==============================================================================
 # Postflop Solver Validated Solutions
 # ==============================================================================
@@ -387,6 +405,7 @@ REF_POSTFLOP_RIVER_POLARIZED = StrategyReferenceRecord(
 
 ALL_STRATEGY_REFERENCES: dict[str, StrategyReferenceRecord] = {
     REF_ILLUSTRATIVE_100BB_6MAX_RFI.id: REF_ILLUSTRATIVE_100BB_6MAX_RFI,
+    REF_ILLUSTRATIVE_100BB_9MAX_RFI.id: REF_ILLUSTRATIVE_100BB_9MAX_RFI,
     REF_CASH_6MAX_100BB_RFI.id: REF_CASH_6MAX_100BB_RFI,
     REF_CASH_6MAX_100BB_SB_COMPLETION.id: REF_CASH_6MAX_100BB_SB_COMPLETION,
     REF_BB_DEFENSE_100BB_6MAX.id: REF_BB_DEFENSE_100BB_6MAX,

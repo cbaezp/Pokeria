@@ -38,12 +38,16 @@ class QuickTemplate:
     learning_notes: str
 
     def to_dict(self) -> dict[str, Any]:
+        cfg_dict = self.config.to_dict()
         return {
             "id": self.id,
+            "template_id": self.id,
             "title": self.title,
             "category": self.category,
             "summary": self.summary,
-            "config": self.config.to_dict(),
+            "description": self.summary,
+            "config": cfg_dict,
+            "configuration": cfg_dict,
             "button_seat": self.button_seat,
             "seats": [
                 {
@@ -63,6 +67,8 @@ class QuickTemplate:
             "hero_seat": self.hero_seat,
             "hero_cards": list(self.hero_cards),
             "learning_notes": self.learning_notes,
+            "suggested_action": self.actions[-1]["action_type"] if self.actions else "FOLD",
+            "tags": [self.config.format_type.value.lower(), self.category.lower()],
         }
 
 

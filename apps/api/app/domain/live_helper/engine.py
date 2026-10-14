@@ -733,15 +733,21 @@ class LiveHelperEngine:
             ]
             is_unopened = all(a.get("action_type") == "fold" for a in non_blind_actions)
 
-            if is_unopened and config.format_type.value == "CASH" and config.max_capacity == 6:
-                # Matches ILLUSTRATIVE_PRACTICE_CHART_100BB_6MAX
-                ref = get_strategy_reference("ILLUSTRATIVE_PRACTICE_CHART_100BB_6MAX")
+            if is_unopened and config.format_type.value == "CASH":
+                ref_id = (
+                    "ILLUSTRATIVE_PRACTICE_CHART_100BB_9MAX"
+                    if config.max_capacity >= 8
+                    else "ILLUSTRATIVE_PRACTICE_CHART_100BB_6MAX"
+                )
+                ref = get_strategy_reference(ref_id) or get_strategy_reference(
+                    "ILLUSTRATIVE_PRACTICE_CHART_100BB_6MAX"
+                )
                 "".join(hero_cards)
                 hand_class = LiveHelperEngine._to_hand_class(hero_cards)
 
-                pos_key = hero_pos.upper().replace("BTN/SB", "BTN")
+                pos_key = hero_pos.upper().replace("BTN/SB", "BTN").replace(" ", "")
                 freqs = PreflopReferenceProvider.get_action_frequencies_for_hand(
-                    "ILLUSTRATIVE_PRACTICE_CHART_100BB_6MAX", pos_key, hand_class or ""
+                    ref_id, pos_key, hand_class or ""
                 )
 
                 if freqs and hand_class:
@@ -770,12 +776,20 @@ class LiveHelperEngine:
 
                     return StrategicVerdict(
                         match_classification=StrategicMatchLevel.EDUCATIONAL_HEURISTIC,
-                        reference_id=ref.id if ref else "ILLUSTRATIVE_PRACTICE_CHART_100BB_6MAX",
+                        reference_id=ref.id if ref else ref_id,
                         reference_name=ref.name
                         if ref
-                        else "6-Max 100bb Cash RFI Instructional Benchmark",
+                        else (
+                            "9-Max Full-Ring 100bb Cash RFI Instructional Benchmark"
+                            if config.max_capacity >= 8
+                            else "6-Max 100bb Cash RFI Instructional Benchmark"
+                        ),
                         reference_version="1.1.0",
-                        provenance="Curated instructional 100bb 6-Max reference benchmark with verified 1,326 combo accounting.",
+                        provenance=(
+                            "Curated instructional 100bb 9-Max full-ring reference benchmark covering UTG through SB."
+                            if config.max_capacity >= 8
+                            else "Curated instructional 100bb 6-Max reference benchmark with verified 1,326 combo accounting."
+                        ),
                         grading_permission=GradingPermission.FREQUENCY_ALIGNMENT.value,
                         action_frequencies=action_freqs,
                         action_evs=None,  # Heuristic charts have no solver EV

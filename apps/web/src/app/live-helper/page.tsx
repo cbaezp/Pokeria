@@ -789,7 +789,10 @@ export default function LiveHelperPage() {
   // Apply Quick Template
   const handleApplyTemplate = (tmpl: LiveHelperTemplate) => {
     setActiveSession(null); // Return to standalone mode
-    setConfig(tmpl.configuration);
+    const tmplConfig = tmpl.configuration || tmpl.config;
+    if (tmplConfig) {
+      setConfig(tmplConfig);
+    }
     setButtonSeat(tmpl.button_seat);
     setSeats(tmpl.seats);
     setActions(tmpl.actions);

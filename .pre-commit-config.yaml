@@ -37,3 +37,17 @@ repos:
         language: system
         files: ^apps/web/src/
         pass_filenames: false
+
+      - id: frontend-tests
+        name: frontend tests (vitest)
+        entry: bash -c "npm --prefix apps/web test"
+        language: system
+        files: ^apps/web/
+        pass_filenames: false
+
+      - id: backend-tests
+        name: backend unit tests (pytest)
+        entry: bash -c ".venv/bin/pytest tests/unit/poker/ tests/unit/learner/ tests/unit/curriculum/ tests/unit/training/"
+        language: system
+        files: ^(apps/api/|tests/)
+        pass_filenames: false

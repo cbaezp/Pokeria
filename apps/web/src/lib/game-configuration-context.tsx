@@ -151,3 +151,7 @@ export function useGameConfiguration() {
   }
   return context;
 }
+
+export function useOptionalGameConfiguration() {
+  return useContext(GameConfigurationContext);
+}
