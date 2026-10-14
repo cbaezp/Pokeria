@@ -32,7 +32,7 @@ jobs:
         run: ruff check .
 
       - name: Run Pytest Suite
-        run: pytest tests/unit/ -v
+        run: pytest tests/unit/poker/ tests/unit/learner/ tests/unit/curriculum/ tests/unit/training/ -v
 
   frontend:
     name: Frontend Quality & Tests

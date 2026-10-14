@@ -263,9 +263,8 @@ class TestCashGradingPolicyAndBoundaries:
         # Locate artifact path
         art_rel = "data/solutions/632c34943e011ef5_eeb2c59a3c21cd7c.json"
         if not os.path.exists(art_rel):
-            art_path = os.path.join("/Users/cbz/Desktop/Pokeria", art_rel)
-        else:
-            art_path = art_rel
+            pytest.skip("Solution artifact not present on disk (gitignored for size)")
+        art_path = art_rel
 
         extracted_actions = node_extractor.get_combo_actions(
             pack_id="632c34943e011ef5",
