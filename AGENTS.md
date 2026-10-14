@@ -67,8 +67,13 @@ Before modifying any file, every agent must:
 
 Pokeria strictly follows Clean Architecture dependency flow:
 
-$$\text{Presentation / API} \longrightarrow \text{Application Use Cases} \longrightarrow \text{Domain Entities & Engines}$$
-$$\text{Infrastructure (DB, Repos, Solver, Disk)} \longrightarrow \text{Domain Entities & Engines}$$
+$$
+\text{Presentation / API} \longrightarrow \text{Application Use Cases} \longrightarrow \text{Domain Entities & Engines}
+$$
+
+$$
+\text{Infrastructure (DB, Repos, Solver, Disk)} \longrightarrow \text{Domain Entities & Engines}
+$$
 
 - **Domain Layer (`apps/api/app/domain/`)**: Pure Python. Zero imports from FastAPI, SQLAlchemy, Alembic, or external I/O.
 - **Application Layer (`apps/api/app/application/`)**: Orchestrates domain entities; receives Unit of Work and Repositories via dependency injection.
@@ -111,7 +116,11 @@ When writing or modifying poker mathematics:
 
 Any modification to table logic, bet sizing, or hand state must satisfy:
 1. **Total Chip Conservation**:
-   $$\sum_{i=1}^N \text{stack}_i^{\text{end}} + \text{rake} = \sum_{i=1}^N \text{stack}_i^{\text{start}}$$
+
+$$
+\sum_{i=1}^N \text{stack}_i^{\text{end}} + \text{rake} = \sum_{i=1}^N \text{stack}_i^{\text{start}}
+$$
+
 2. **Legal Betting Actions**:
    - Minimum raise must equal or exceed the previous raise increment.
    - An all-in for less than a full raise does **not** reopen action to players who have already acted.

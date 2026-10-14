@@ -11,7 +11,9 @@ When a student has played few hands in a given strategic spot (e.g. facing a 3-b
 
 Pokeria applies Empirical Bayes shrinkage toward the population baseline:
 
-$$\hat{\theta}_{\text{shrunk}} = \frac{N}{N + M} \bar{X} + \frac{M}{N + M} \mu_0$$
+$$
+\hat{\theta}_{\text{shrunk}} = \frac{N}{N + M} \bar{X} + \frac{M}{N + M} \mu_0
+$$
 
 Where:
 - $N$ = Number of student attempts in that specific spot family.

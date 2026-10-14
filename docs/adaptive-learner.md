@@ -70,26 +70,45 @@ Located in `apps/api/app/domain/learner/baselines.py`.
 * **Purpose**: Establish an uninformative reference prior across the curriculum.
 * **Prior Assumption**: Default error probability $p_0 = 0.30$ ($\alpha_0 = 1.5, \beta_0 = 3.5$).
 * **Standard Error**:
-  $$\text{SE} = \sqrt{\frac{\hat{p}(1 - \hat{p})}{N}} \quad (\text{defaults to } 0.20 \text{ when } N=0)$$
+
+$$
+\text{SE} = \sqrt{\frac{\hat{p}(1 - \hat{p})}{N}} \quad (\text{defaults to } 0.20 \text{ when } N=0)
+$$
 
 #### Baseline 1: Empirical Bayes User Mean
 * **Purpose**: Smooth individual learner error rates toward the global mean, avoiding extreme swings on small sample sizes.
 * **Mathematical Formula**:
-  $$\hat{p}_{\text{user}} = \frac{\sum_{i=1}^N y_i + M \cdot p_0}{N + M}$$
+
+$$
+\hat{p}_{\text{user}} = \frac{\sum_{i=1}^N y_i + M \cdot p_0}{N + M}
+$$
+
   where $y_i \in \{0, 1\}$ indicates whether decision $i$ was a material mistake ($\Delta \text{EV} \ge 1.0$), $N$ is the number of user decisions, $p_0$ is the global prior ($0.30$), and $M = 5.0$ is the pseudo-observation shrinkage weight.
 * **Sample Size Behavior**:
   - At $N = 0$: $\hat{p}_{\text{user}} = 0.30$ (pure prior).
   - At $N = 1$ with 1 mistake ($y_1 = 1$):
-    $$\hat{p}_{\text{user}} = \frac{1 + 5.0(0.30)}{1 + 5.0} = \frac{2.5}{6.0} \approx 0.417$$
+
+$$
+\hat{p}_{\text{user}} = \frac{1 + 5.0(0.30)}{1 + 5.0} = \frac{2.5}{6.0} \approx 0.417
+$$
+
     *(Instead of an erroneous 100% error rate).*
   - At $N = 50$ with 10 mistakes:
-    $$\hat{p}_{\text{user}} = \frac{10 + 1.5}{50 + 5} = \frac{11.5}{55} \approx 0.209$$
+
+$$
+\hat{p}_{\text{user}} = \frac{10 + 1.5}{50 + 5} = \frac{11.5}{55} \approx 0.209
+$$
+
     *(Converges to empirical user frequency as evidence accumulates).*
 
 #### Baseline 2: Hierarchical Scenario-Family Shrinkage
 * **Purpose**: Estimate error probability for a specific strategic family (e.g., `SRP_IP_C-BET`, `3BET_OOP_CHECK_RAISE`) by shrinking the family-specific rate toward the user's overall mean.
 * **Mathematical Formula**:
-  $$\hat{p}_{\text{family}} = \frac{\sum_{k=1}^{N_{\text{fam}}} y_{k,\text{fam}} + S \cdot \hat{p}_{\text{user}}}{N_{\text{fam}} + S}$$
+
+$$
+\hat{p}_{\text{family}} = \frac{\sum_{k=1}^{N_{\text{fam}}} y_{k,\text{fam}} + S \cdot \hat{p}_{\text{user}}}{N_{\text{fam}} + S}
+$$
+
   where $S = 3.0$ is the family shrinkage weight.
 * **Benefit**: Allows weakness detection in specific spots while borrowing statistical strength across the user's broader decision history.
 
@@ -104,12 +123,22 @@ A pure-Python numerical implementation with zero external C-dependencies or blac
 
 #### Feature Standardizer (`FeatureStandardScaler`)
 To ensure L2 regularization treats all features uniformly regardless of scale, features are normalized using Z-score standardization fitted strictly on training data:
-$$\mu_j = \frac{1}{N}\sum_{i=1}^N X_{i,j}, \quad \sigma_j = \sqrt{\frac{1}{N}\sum_{i=1}^N (X_{i,j} - \mu_j)^2 + \epsilon}$$
-$$X^{\text{scaled}}_{i,j} = \frac{X_{i,j} - \mu_j}{\sigma_j}$$
+
+$$
+\mu_j = \frac{1}{N}\sum_{i=1}^N X_{i,j}, \quad \sigma_j = \sqrt{\frac{1}{N}\sum_{i=1}^N (X_{i,j} - \mu_j)^2 + \epsilon}
+$$
+
+$$
+X^{\text{scaled}}_{i,j} = \frac{X_{i,j} - \mu_j}{\sigma_j}
+$$
 
 #### Objective Function & Optimization
 The model optimizes binary cross-entropy loss penalized with an L2 weight regularization term:
-$$J(w, b) = -\frac{1}{N}\sum_{i=1}^N \left[ y_i \ln(\sigma(z_i)) + (1 - y_i) \ln(1 - \sigma(z_i)) \right] + \frac{\lambda}{2N} \|w\|_2^2$$
+
+$$
+J(w, b) = -\frac{1}{N}\sum_{i=1}^N \left[ y_i \ln(\sigma(z_i)) + (1 - y_i) \ln(1 - \sigma(z_i)) \right] + \frac{\lambda}{2N} \|w\|_2^2
+$$
+
 where:
 - $z_i = b + \sum_{j=1}^D w_j X^{\text{scaled}}_{i,j}$
 - $\sigma(z) = \frac{1}{1 + e^{-\text{clip}(z, -30, 30)}}$ (numerically stabilized against floating-point overflow)
@@ -117,8 +146,14 @@ where:
 
 #### Analytical Gradients
 Gradients are computed exactly at each iteration:
-$$\frac{\partial J}{\partial b} = \frac{1}{N}\sum_{i=1}^N (\hat{p}_i - y_i)$$
-$$\frac{\partial J}{\partial w_j} = \frac{1}{N}\sum_{i=1}^N (\hat{p}_i - y_i) X^{\text{scaled}}_{i,j} + \frac{\lambda}{N} w_j$$
+
+$$
+\frac{\partial J}{\partial b} = \frac{1}{N}\sum_{i=1}^N (\hat{p}_i - y_i)
+$$
+
+$$
+\frac{\partial J}{\partial w_j} = \frac{1}{N}\sum_{i=1}^N (\hat{p}_i - y_i) X^{\text{scaled}}_{i,j} + \frac{\lambda}{N} w_j
+$$
 
 #### Training Convergence
 - Gradient descent runs for up to `max_iter = 400` iterations with learning rate `learning_rate = 0.05`.
@@ -135,12 +170,20 @@ Before any trained model is promoted to serve live recommendations:
 1. **Time-Ordered Split**: Data is partitioned chronologically (80% train, 20% validation) to prevent future data leakage.
 2. **Metrics Evaluated**:
    - **Brier Score**: Mean squared difference between predicted probabilities and binary outcomes:
-     $$\text{Brier} = \frac{1}{N_{\text{val}}}\sum_{i=1}^{N_{\text{val}}} (\hat{p}_i - y_i)^2$$
+
+$$
+\text{Brier} = \frac{1}{N_{\text{val}}}\sum_{i=1}^{N_{\text{val}}} (\hat{p}_i - y_i)^2
+$$
+
    - **Log-Loss**: Cross-entropy on validation set.
    - **Calibration Error**: Binned reliability comparison.
 3. **Promotion Quality Gate**:
    A candidate model is promoted to `ACTIVE` status if and only if:
-   $$\text{Brier}_{\text{candidate}} < \text{Brier}_{\text{baseline}}$$
+
+$$
+\text{Brier}_{\text{candidate}} < \text{Brier}_{\text{baseline}}
+$$
+
    If the candidate fails to outperform the baseline, it is rejected and marked `REJECTED_UNDERPERFORMING`. The platform remains on `RULE_BASED_BASELINE`.
 
 ---
@@ -174,7 +217,10 @@ Located in `apps/api/app/domain/assessment/scheduler.py` and `retention_analytic
 
 #### Review Interval Sequence
 Pokeria uses a conservative, pedagogically grounded review schedule:
-$$\text{Interval Sequence: } [1, 3, 7, 14, 30] \text{ days}$$
+
+$$
+\text{Interval Sequence: } [1, 3, 7, 14, 30] \text{ days}
+$$
 
 #### Outcome Classification (Target Policy v2.0)
 Decisions in review spots are classified based on measured EV loss against solver equilibrium:
@@ -205,7 +251,10 @@ Here is how a real user interaction flows through the learner architecture:
    - Global prior: $p_0 = 0.30$.
    - User historical mean across all 12 decisions: 5 mistakes total $\implies \hat{p}_{\text{user}} = \frac{5 + 5(0.3)}{12 + 5} = \frac{6.5}{17} \approx 0.382$.
    - Hierarchical family rate:
-     $$\hat{p}_{\text{3BET\_OOP}} = \frac{4 + 3(0.382)}{6 + 3} = \frac{5.146}{9} \approx 0.572 \quad (57.2\% \text{ estimated error probability})$$
+
+$$
+\hat{p}_{\text{3BET-OOP}} = \frac{4 + 3(0.382)}{6 + 3} = \frac{5.146}{9} \approx 0.572 \quad (57.2\% \text{ estimated error probability})
+$$
 4. **Candidate Spot Scoring** (`Baseline3RuleBasedRecommender`):
    - Candidate A (`SRP_IP_CBET`): prior error rate $10\%$, exposures $6$ $\implies$ Score: $0.35$.
    - Candidate B (`3BET_OOP_DEFENSE` - river spot with past blunder):

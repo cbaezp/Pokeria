@@ -132,7 +132,11 @@ Automated boundary tests (`tests/architecture/test_boundaries.py`) continuously 
 
 ### 3.3. Decision Grading Authority (`apps/api/app/domain/training/grading.py`)
 * Computes real EV regret against equilibrium:
-  $$\Delta \text{EV} = \max_a \text{EV}(a) - \text{EV}(a_{\text{chosen}})$$
+
+$$
+\Delta \text{EV} = \max_a \text{EV}(a) - \text{EV}(a_{\text{chosen}})
+$$
+
 * Assigns verified categorical grades: Strong ($\le 0.10$), Acceptable ($\le 0.50$), Inaccuracy ($\le 1.50$), Mistake ($\le 4.00$), and Blunder ($> 4.00$).
 * **Fails closed with `UNGRADED`** if the solver run did not converge, an action is illegal, or reference EV data is corrupted.
 

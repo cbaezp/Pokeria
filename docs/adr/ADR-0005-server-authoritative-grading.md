@@ -13,7 +13,11 @@ In poker training applications, students drill decisions (such as calling a rive
 We enforce **Server-Authoritative Grading** across all drills, Math Lab exercises, and training sessions:
 1. **Cryptographic Exercise Tokens**: Math Lab exercises issue HMAC-SHA256 signed state tokens containing exercise parameters. Answers submitted to `/api/v1/math-lab/exercises/{id}/submit` are verified against server-computed truth; tampered or expired tokens are rejected.
 2. **Server-Side Grading Engine**: The `DecisionGradingEngine` (`apps/api/app/domain/training/grading.py`) is the sole authority for computing EV regret:
-   $$\Delta \text{EV} = \max_a \text{EV}(a) - \text{EV}(a_{\text{chosen}})$$
+
+$$
+\Delta \text{EV} = \max_a \text{EV}(a) - \text{EV}(a_{\text{chosen}})
+$$
+
 3. **Explicit UNGRADED Status**: If solver reference data did not converge (`UNVALIDATED_SOLVER_RUN`), an illegal action was chosen (`ILLEGAL_ACTION`), or data contains non-finite numbers (`CORRUPTED_ACTION_EV`), the server explicitly assigns `GradeCategory.UNGRADED`. It never invents placeholder EV losses.
 4. **Tournament Equity Isolation**: Tournament ICM decisions are routed under `CSTE_POLICY_PENDING` and marked `UNGRADED` to prevent applying arbitrary chip-EV thresholds to prize equity.
 

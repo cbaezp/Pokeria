@@ -80,7 +80,7 @@
   1. Illegal/unmodeled action (`matched_item is None`): returns `raw_ev_loss = None`, `chosen_action_ev = None`, `grade = GradeCategory.UNGRADED`, `grading_status = "UNGRADED"`, `grading_provenance = "ILLEGAL_ACTION"`.
   2. Missing action EV (`matched_item.action_ev is None`): falls back to `_evaluate_frequency_decision` with `raw_ev_loss = None`, `grading_status = "FREQUENCY_ONLY"`.
   3. Corrupted action EV (NaN, Inf): rejects and returns `raw_ev_loss = None`, `grade = GradeCategory.UNGRADED`, `grading_status = "UNGRADED"`, `grading_provenance = "CORRUPTED_ACTION_EV"`.
-  4. Authentic zero EV loss: strictly preserved only when optimal action with known EV is played ($\Delta EV < 1e-4 \implies \text{ev\_loss} = 0.0$).
+  4. Authentic zero EV loss: strictly preserved only when optimal action with known EV is played ($\Delta EV < 1e-4 \implies \text{ev-loss} = 0.0$).
   5. `apps/api/app/domain/learner/baselines.py`: strictly checks `math.isfinite(raw_loss)` and ignores `None` without substituting 0.0.
   6. Verified in `tests/unit/training/test_grading_engine.py` (14/14 passed).
 
@@ -90,7 +90,11 @@
   - In `PayoffModel.CHIP_EV`: NashConv is strictly expressed in **big blinds per hand** ($\text{bb/hand}$).
   - In `PayoffModel.ICM`: NashConv is computed using **Chip-Scaled Tournament Equity** ($\text{CSTE/hand}$).
   - To convert CSTE NashConv to prize pool fraction:
-    $$\text{NashConv}_{\text{prize}} = \frac{\text{NashConv}_{\text{CSTE}}}{cste\_mult} = \text{NashConv}_{\text{CSTE}} \times \frac{\sum \text{Payouts}}{\sum \text{Chips}}$$
+
+$$
+\text{NashConv}_{\text{prize}} = \frac{\text{NashConv}_{\text{CSTE}}}{\text{cste-mult}} = \text{NashConv}_{\text{CSTE}} \times \frac{\sum \text{Payouts}}{\sum \text{Chips}}
+$$
+
   - Canonical convergence threshold: $\text{NashConv} \le 0.08\text{ bb/hand}$ (or CSTE/hand). All certified packs meet $\text{NashConv} \le 0.05$.
 
 ### E. Equity Terminology & Canonical Presentation
@@ -99,7 +103,11 @@
   - $\text{Loss Probability } P_{\text{lose}}$: Probability that Villain's 5-card hand rank strictly exceeds Hero's.
   - $\text{Tie Probability } P_{\text{tie}}$: Probability that Hero and Villain have identical 5-card hand ranks.
   - **Showdown Equity $E$**: Expected share of the showdown pot:
-    $$E = P_{\text{win}} + \frac{1}{2} P_{\text{tie}}$$
+
+$$
+E = P_{\text{win}} + \frac{1}{2} P_{\text{tie}}
+$$
+
   - Satisfies $E_{\text{hero}} + E_{\text{villain}} = 1.0$ (or $100\%$).
 - **Oracle Verification**:
   - In `apps/api/app/domain/poker/preflop_equity.py`, canonical benchmark tuples represent $(P_{\text{win}}, P_{\text{tie}}, P_{\text{lose}})$.
@@ -151,11 +159,19 @@ In addition to the 11 active curriculum slices registered in `data/solutions/man
   - **Global Prior**: Beta-Bernoulli conjugate model with default hyperpriors $\alpha_0 = 1.5, \beta_0 = 3.5$ ($p_0 = 0.30$).
   - **Empirical Bayes Shrinkage**: $\hat{p}_{\text{user}} = \frac{\sum y_i + M \cdot p_0}{N + M}$ with shrinkage weight $M = 5.0$.
   - **Hierarchical Shrinkage**: Scenario-family error rates shrunk towards the user's historical mean with weight $S = 3.0$:
-    $$\hat{p}_{\text{family}} = \frac{\sum y_{i,\text{fam}} + S \cdot \hat{p}_{\text{user}}}{N_{\text{fam}} + S}$$
+
+$$
+\hat{p}_{\text{family}} = \frac{\sum y_{i,\text{fam}} + S \cdot \hat{p}_{\text{user}}}{N_{\text{fam}} + S}
+$$
+
 - **L2 Regularized Logistic Regression**:
   - Exact objective: $J(w, b) = -\frac{1}{N}\sum [y_i \log \sigma(z_i) + (1-y_i)\log(1-\sigma(z_i))] + \frac{\lambda}{2N}\|w\|_2^2$.
   - Optimization: Deterministic gradient descent with analytical gradient:
-    $$\nabla_w J = \frac{1}{N} X^T (\sigma(Xw + b) - y) + \frac{\lambda}{N} w$$
+
+$$
+\nabla_w J = \frac{1}{N} X^T (\sigma(Xw + b) - y) + \frac{\lambda}{N} w
+$$
+
   - Verified against central finite differences with numerical tolerance $\Delta < 10^{-5}$.
 - **Calibration Metrics (Brier Score, Log Loss, ECE)**:
   - Brier Score: $BS = \frac{1}{N} \sum (\hat{p}_i - y_i)^2$.

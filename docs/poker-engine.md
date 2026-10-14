@@ -60,7 +60,11 @@ Located in `apps/api/app/domain/poker/pot.py`.
 
 ### 3.1. Chip Conservation Law
 The pot engine enforces strict chip conservation:
-$$\sum_{i=1}^N \text{Initial Stack}_i = \sum_{i=1}^N \text{Final Stack}_i + \text{Rake}$$
+
+$$
+\sum_{i=1}^N \text{Initial Stack}_i = \sum_{i=1}^N \text{Final Stack}_i + \text{Rake}
+$$
+
 No chip can be created or destroyed during hand execution.
 
 ### 3.2. Uncalled Wagers & Tiered Side Pots
@@ -97,8 +101,14 @@ Located in `PotEngine.settle_showdown()` in `apps/api/app/domain/poker/pot.py`.
 
 ### 4.1. Split-Pot Division
 When multiple eligible contenders achieve identical hand strengths:
-$$\text{Base Share} = \lfloor \frac{\text{Pot Amount}}{\text{Contender Count}} \rfloor$$
-$$\text{Odd Chips} = \text{Pot Amount} \pmod{\text{Contender Count}}$$
+
+$$
+\text{Base Share} = \lfloor \frac{\text{Pot Amount}}{\text{Contender Count}} \rfloor
+$$
+
+$$
+\text{Odd Chips} = \text{Pot Amount} \pmod{\text{Contender Count}}
+$$
 
 ### 4.2. Official Casino / TDA Odd-Chip Priority
 To eliminate arbitrary tie-breaking, Pokeria strictly follows the Tournament Directors Association (TDA) and standard casino ruleset:

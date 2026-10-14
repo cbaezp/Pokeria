@@ -63,15 +63,31 @@ Upstream `postflop` only serialized action frequencies (`strategy: Vec<f32>`) in
 ### Mathematical Definition
 For a decision node $u$ with acting player $p$ and opponent reach $\pi_{-p}$:
 1. **Opponent Compatible Mass**:
-   $$M(i) = \sum_{j \text{ compatible with } i} \pi_{-p}(j)$$
+
+$$
+M(i) = \sum_{j \text{ compatible with } i} \pi_{-p}(j)
+$$
+
 2. **Conditional Action EV**:
    For action $a$ transitioning to child node $v_a = \mathrm{child}(u, a)$, evaluate subtree counterfactual values $\mathrm{CFV}_p(v_a, i)$ under average continuation profile $\sigma$:
-   $$\mathrm{EV}(i, a) = \frac{\mathrm{CFV}_p(v_a, i)}{M(i)}$$
+
+$$
+\mathrm{EV}(i, a) = \frac{\mathrm{CFV}_p(v_a, i)}{M(i)}
+$$
+
 3. **Node Strategy EV**:
-   $$\mathrm{EV}(i) = \sum_{a} \sigma_p(u, a, i) \cdot \mathrm{EV}(i, a)$$
+
+$$
+\mathrm{EV}(i) = \sum_{a} \sigma_p(u, a, i) \cdot \mathrm{EV}(i, a)
+$$
+
 4. **Indifference Property**:
    At approximate Nash equilibrium, for any combo $i$ with mixed actions $\sigma(a_1) > 0, \sigma(a_2) > 0$:
-   $$\mathrm{EV}(i, a_1) \approx \mathrm{EV}(i, a_2) \approx \mathrm{EV}(i)$$
+
+$$
+\mathrm{EV}(i, a_1) \approx \mathrm{EV}(i, a_2) \approx \mathrm{EV}(i)
+$$
+
    Unplayed actions have $\mathrm{EV}(i, a_{\text{inferior}}) \le \mathrm{EV}(i)$.
 
 ### Implementation

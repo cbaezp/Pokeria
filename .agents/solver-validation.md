@@ -22,7 +22,11 @@ Pokeria maintains specific patches:
 When evaluating user actions against a solver equilibrium artifact (`apps/api/app/domain/training/grading.py`):
 
 1. **Non-Negative EV Loss**:
-   $$\text{EV Loss} = \max_{a \in A} \text{EV}(a) - \text{EV}(a_{\text{chosen}}) \ge 0$$
+
+$$
+\text{EV Loss} = \max_{a \in A} \text{EV}(a) - \text{EV}(a_{\text{chosen}}) \ge 0
+$$
+
    An EV loss can never be negative. If calculated as negative due to floating-point imprecision, clamp to `0.0` only if within machine epsilon ($10^{-5}$); otherwise raise `CorruptedEVError`.
 
 2. **Categorical Action Classifications**:
