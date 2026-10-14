@@ -1,0 +1,16 @@
+board = "Ah Kd 2c 7s 9c"
+oop_range = "AA,KK,QQ,JJ,TT,99,77,22,AKs,AKo,A5s"
+ip_range = "AA,KK,QQ,JJ,TT,99,77,22,AKs,AKo,KQo,QJs"
+effective_stack = 100.0
+starting_pot = 20.0
+raise_cap = 2
+max_iterations = 500
+target_exploitability = 0.05
+
+[sizings.oop.river]
+bet = { percents = [33.0, 75.0, 150.0], allin = true }
+raise = { percents = [50.0, 100.0], allin = true }
+
+[sizings.ip.river]
+bet = { percents = [33.0, 75.0], allin = true }
+raise = { percents = [50.0, 100.0], allin = true }

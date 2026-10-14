@@ -1,0 +1,22 @@
+board = "Js 8c 4d 2h"
+oop_range = "QQ,JJ,88,44,AJs,KJs,QJs,JTs,T9s,98s,87s,76s,65s,AJo,KJo"
+ip_range = "AA,KK,QQ,JJ,88,44,AJs,ATs,A8s,KJs,KTs,QJs,JTs,T9s,98s,AKo,AQo"
+effective_stack = 94.0
+starting_pot = 12.0
+raise_cap = 1
+max_iterations = 200
+target_exploitability = 0.5
+
+[sizings.oop.turn]
+bet = { percents = [66.0] }
+
+[sizings.ip.turn]
+bet = { percents = [66.0] }
+raise = { percents = [100.0] }
+
+[sizings.oop.river]
+bet = { percents = [66.0], allin = true }
+
+[sizings.ip.river]
+bet = { percents = [66.0], allin = true }
+raise = { percents = [100.0], allin = true }

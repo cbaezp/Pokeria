@@ -1,0 +1,90 @@
+[
+  {
+    "benchmark": "Simple River (1-size)",
+    "config": "bench_simple_river.toml",
+    "exit_code": 0,
+    "wall_clock_python_s": 0.0163,
+    "peak_rss_bytes": 2801664,
+    "peak_rss_mb": 2.67,
+    "artifact_bytes": 5787,
+    "stdout": "tree: 5 decision, 0 chance, 3 fold, 4 showdown terminals (12 nodes total)\nstrategy storage: F32, 1008 bytes [measured]  (regret + strategy-sum arrays)\nchance maps: 0 bytes [measured]\niter      100  exploitability 0.029509 chips  0.2951% of pot  [measured]\niter      200  exploitability 0.006899 chips  0.0690% of pot  [measured]\niter      300  exploitability 0.013632 chips  0.1363% of pot  [measured]\niter      400  exploitability 0.005804 chips  0.0580% of pot  [measured]\niter      500  exploitability 0.004209 chips  0.0421% of pot  [measured]\n=== final report ===\niterations: 500\nwall time: 0.0022 s [measured]\nexploitability: 0.004209 chips  0.0421% of pot  [measured]\nOOP EV: zero-sum -0.9091  pot-share 4.0909  [measured]\nIP  EV: zero-sum 0.9091  pot-share 5.9091  [measured]\nwrote /Users/cbz/Desktop/Pokeria/data/benchmarks/outputs/bench_simple_river.sol\n",
+    "stderr_time": "        0.01 real         0.00 user         0.00 sys\n             2801664  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 273  page reclaims\n                  69  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   2  voluntary context switches\n                  44  involuntary context switches\n            51441738  instructions retired\n            22043330  cycles elapsed\n             1327392  peak memory footprint\n"
+  },
+  {
+    "benchmark": "Multi-node River (multi-size)",
+    "config": "bench_multinode_river.toml",
+    "exit_code": 0,
+    "wall_clock_python_s": 0.0382,
+    "peak_rss_bytes": 3424256,
+    "peak_rss_mb": 3.27,
+    "artifact_bytes": 120845,
+    "stdout": "tree: 32 decision, 0 chance, 30 fold, 31 showdown terminals (93 nodes total)\nstrategy storage: F32, 36800 bytes [measured]  (regret + strategy-sum arrays)\nchance maps: 0 bytes [measured]\niter      100  exploitability 0.110757 chips  0.5538% of pot  [measured]\niter      200  exploitability 0.045202 chips  0.2260% of pot  [measured]\niter      300  exploitability 0.020462 chips  0.1023% of pot  [measured]\niter      400  exploitability 0.009087 chips  0.0454% of pot  [measured]\n=== final report ===\niterations: 400\nwall time: 0.0302 s [measured]\nexploitability: 0.009087 chips  0.0454% of pot  [measured]\nOOP EV: zero-sum 0.7756  pot-share 10.7756  [measured]\nIP  EV: zero-sum -0.7756  pot-share 9.2244  [measured]\nwrote /Users/cbz/Desktop/Pokeria/data/benchmarks/outputs/bench_multinode_river.sol\n",
+    "stderr_time": "        0.03 real         0.03 user         0.00 sys\n             3424256  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 380  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   1  voluntary context switches\n                  24  involuntary context switches\n           591339323  instructions retired\n           120522605  cycles elapsed\n             1949984  peak memory footprint\n"
+  },
+  {
+    "benchmark": "Variable Stack 20bb",
+    "config": "bench_variable_stack_20.toml",
+    "exit_code": 0,
+    "wall_clock_python_s": 0.0101,
+    "peak_rss_bytes": 3063808,
+    "peak_rss_mb": 2.92,
+    "artifact_bytes": 35782,
+    "stdout": "tree: 8 decision, 0 chance, 6 fold, 7 showdown terminals (21 nodes total)\nstrategy storage: F32, 9520 bytes [measured]  (regret + strategy-sum arrays)\nchance maps: 0 bytes [measured]\niter      100  exploitability 0.015909 chips  0.0795% of pot  [measured]\niter      200  exploitability 0.003624 chips  0.0181% of pot  [measured]\n=== final report ===\niterations: 200\nwall time: 0.0036 s [measured]\nexploitability: 0.003624 chips  0.0181% of pot  [measured]\nOOP EV: zero-sum -0.0835  pot-share 9.9165  [measured]\nIP  EV: zero-sum 0.0835  pot-share 10.0835  [measured]\nwrote /Users/cbz/Desktop/Pokeria/data/benchmarks/outputs/bench_variable_stack_20.sol\n",
+    "stderr_time": "        0.00 real         0.00 user         0.00 sys\n             3063808  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 358  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   1  voluntary context switches\n                   6  involuntary context switches\n            93581550  instructions retired\n            22227473  cycles elapsed\n             1589536  peak memory footprint\n"
+  },
+  {
+    "benchmark": "Variable Stack 200bb",
+    "config": "bench_variable_stack_200.toml",
+    "exit_code": 0,
+    "wall_clock_python_s": 0.0162,
+    "peak_rss_bytes": 3260416,
+    "peak_rss_mb": 3.11,
+    "artifact_bytes": 90892,
+    "stdout": "tree: 20 decision, 0 chance, 18 fold, 19 showdown terminals (57 nodes total)\nstrategy storage: F32, 26656 bytes [measured]  (regret + strategy-sum arrays)\nchance maps: 0 bytes [measured]\niter      100  exploitability 0.256159 chips  1.2808% of pot  [measured]\niter      200  exploitability 0.070009 chips  0.3500% of pot  [measured]\n=== final report ===\niterations: 200\nwall time: 0.0096 s [measured]\nexploitability: 0.070009 chips  0.3500% of pot  [measured]\nOOP EV: zero-sum -0.2171  pot-share 9.7829  [measured]\nIP  EV: zero-sum 0.2171  pot-share 10.2171  [measured]\nwrote /Users/cbz/Desktop/Pokeria/data/benchmarks/outputs/bench_variable_stack_200.sol\n",
+    "stderr_time": "        0.01 real         0.01 user         0.00 sys\n             3260416  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 370  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   1  voluntary context switches\n                   8  involuntary context switches\n           226578076  instructions retired\n            45855570  cycles elapsed\n             1786144  peak memory footprint\n"
+  },
+  {
+    "benchmark": "Rake Configuration (5% cap 3)",
+    "config": "bench_rake.toml",
+    "exit_code": 0,
+    "wall_clock_python_s": 0.0091,
+    "peak_rss_bytes": 3096576,
+    "peak_rss_mb": 2.95,
+    "artifact_bytes": 53798,
+    "stdout": "tree: 12 decision, 0 chance, 10 fold, 11 showdown terminals (33 nodes total)\nstrategy storage: F32, 15232 bytes [measured]  (regret + strategy-sum arrays)\nchance maps: 0 bytes [measured]\niter      100  exploitability -1.293888 chips  -6.4694% of pot  [measured]\n=== final report ===\niterations: 100\nwall time: 0.0029 s [measured]\nexploitability: -1.293888 chips  -6.4694% of pot  [measured]\nOOP EV: zero-sum -0.8515  pot-share 9.1485  [measured]\nIP  EV: zero-sum -0.5067  pot-share 9.4933  [measured]\nwrote /Users/cbz/Desktop/Pokeria/data/benchmarks/outputs/bench_rake.sol\n",
+    "stderr_time": "        0.00 real         0.00 user         0.00 sys\n             3096576  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 360  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                   8  involuntary context switches\n            80615800  instructions retired\n            19845130  cycles elapsed\n             1622304  peak memory footprint\n"
+  },
+  {
+    "benchmark": "Tournament ICM (6-seat 3-paid)",
+    "config": "bench_tournament.toml",
+    "exit_code": 0,
+    "wall_clock_python_s": 0.0101,
+    "peak_rss_bytes": 3080192,
+    "peak_rss_mb": 2.94,
+    "artifact_bytes": 37483,
+    "stdout": "tree: 8 decision, 0 chance, 6 fold, 7 showdown terminals (21 nodes total)\nstrategy storage: F32, 9520 bytes [measured]  (regret + strategy-sum arrays)\nchance maps: 0 bytes [measured]\niter      100  NashConv 0.014487 cste chips  0.0724% of pot  [measured]\niter      200  NashConv 0.002014 cste chips  0.0101% of pot  [measured]\n=== final report ===\niterations: 200\nwall time: 0.0038 s [measured]\npayoff unit: cste (chip-scaled tournament equity)\nNashConv: 0.002014 cste chips  0.0101% of pot  [measured]\n  (both players' unilateral best-response gains, summed; the game is general-sum, so zero does not certify a minimum EV)\nOOP EV: zero-sum -1.5293  pot-share 29.5518  [measured]\nIP  EV: zero-sum -0.6818  pot-share 38.3784  [measured]\nOOP seat 0 (20 chips, 30 with this pot)  gain 0.001062 cste chips  bubble factor vs seat 1 1.7202 (required equity 63.24%)  [measured]\nIP  seat 1 (32 chips, 42 with this pot)  gain 0.000952 cste chips  bubble factor vs seat 0 1.4713 (required equity 59.54%)  [measured]\nicm: 6 seats, 3 paid, 13 terminals mapped  [measured]\nwrote /Users/cbz/Desktop/Pokeria/data/benchmarks/outputs/bench_tournament.sol\n",
+    "stderr_time": "        0.00 real         0.00 user         0.00 sys\n             3080192  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 359  page reclaims\n                   0  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   0  voluntary context switches\n                   7  involuntary context switches\n            96617859  instructions retired\n            23507214  cycles elapsed\n             1605920  peak memory footprint\n"
+  },
+  {
+    "benchmark": "Turn (48 river chance transitions)",
+    "config": "bench_turn.toml",
+    "exit_code": 0,
+    "wall_clock_python_s": 0.2326,
+    "peak_rss_bytes": 10584064,
+    "peak_rss_mb": 10.09,
+    "artifact_bytes": 4321918,
+    "stdout": "tree: 1061 decision, 4 chance, 675 fold, 864 showdown terminals (2604 nodes total)\nstrategy storage: F32, 1311192 bytes [measured]  (regret + strategy-sum arrays)\nchance maps: 26496 bytes [measured]\niter      100  exploitability 0.120034 chips  1.0003% of pot  [measured]\niter      200  exploitability 0.045391 chips  0.3783% of pot  [measured]\n=== final report ===\niterations: 200\nwall time: 0.1951 s [measured]\nexploitability: 0.045391 chips  0.3783% of pot  [measured]\nOOP EV: zero-sum -0.2344  pot-share 5.7656  [measured]\nIP  EV: zero-sum 0.2344  pot-share 6.2344  [measured]\nwrote /Users/cbz/Desktop/Pokeria/data/benchmarks/outputs/bench_turn.sol\n",
+    "stderr_time": "        0.22 real         0.86 user         0.54 sys\n            10584064  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                 837  page reclaims\n                   2  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                   1  voluntary context switches\n               74637  involuntary context switches\n         12455720609  instructions retired\n          4603788729  cycles elapsed\n             9109840  peak memory footprint\n"
+  },
+  {
+    "benchmark": "Flop (49 turn * 48 river transitions)",
+    "config": "bench_flop.toml",
+    "exit_code": 0,
+    "wall_clock_python_s": 0.8476,
+    "peak_rss_bytes": 96501760,
+    "peak_rss_mb": 92.03,
+    "artifact_bytes": 30823115,
+    "stdout": "tree: 28521 decision, 198 chance, 9507 fold, 18816 showdown terminals (57042 nodes total)\nstrategy storage: F32, 23221408 bytes [measured]  (regret + strategy-sum arrays)\nchance maps: 1219368 bytes [measured]\niter       50  exploitability 0.024102 chips  0.4017% of pot  [measured]\n=== final report ===\niterations: 50\nwall time: 0.4931 s [measured]\nexploitability: 0.024102 chips  0.4017% of pot  [measured]\nOOP EV: zero-sum 0.0542  pot-share 3.0542  [measured]\nIP  EV: zero-sum -0.0542  pot-share 2.9458  [measured]\nwrote /Users/cbz/Desktop/Pokeria/data/benchmarks/outputs/bench_flop.sol\n",
+    "stderr_time": "        0.84 real         3.74 user         0.28 sys\n            96501760  maximum resident set size\n                   0  average shared memory size\n                   0  average unshared data size\n                   0  average unshared stack size\n                6075  page reclaims\n                   1  page faults\n                   0  swaps\n                   0  block input operations\n                   0  block output operations\n                   0  messages sent\n                   0  messages received\n                   0  signals received\n                  16  voluntary context switches\n               27704  involuntary context switches\n         54624071198  instructions retired\n         12913593345  cycles elapsed\n            95060376  peak memory footprint\n"
+  }
+]

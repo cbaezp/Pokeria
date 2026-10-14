@@ -1,0 +1,165 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pokerlab-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pokerlab}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pokerlab_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-pokerlab_dev}
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pokerlab} -d ${POSTGRES_DB:-pokerlab_dev}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  migration:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: pokerlab-migration
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_SYNC_URL: postgresql+psycopg://${POSTGRES_USER:-pokerlab}:${POSTGRES_PASSWORD:-pokerlab_secret}@postgres:5432/${POSTGRES_DB:-pokerlab_dev}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "[pokerlab-migration] Waiting for PostgreSQL..."
+        python3 -c "
+        import sys, time, psycopg
+        raw_url = '$${DATABASE_SYNC_URL}'
+        url = raw_url.replace('postgresql+psycopg://', 'postgresql://').replace('postgresql+asyncpg://', 'postgresql://')
+        for i in range(30):
+            try:
+                conn = psycopg.connect(url)
+                conn.close()
+                print('[pokerlab-migration] Database ready!')
+                sys.exit(0)
+            except Exception as e:
+                time.sleep(1)
+        sys.exit(1)
+        "
+        echo "[pokerlab-migration] Executing Alembic database migrations..."
+        alembic upgrade head
+        echo "[pokerlab-migration] Database migrations applied successfully."
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: pokerlab-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      API_PORT: 8000
+      API_HOST: 0.0.0.0
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-pokerlab}:${POSTGRES_PASSWORD:-pokerlab_secret}@postgres:5432/${POSTGRES_DB:-pokerlab_dev}
+      DATABASE_SYNC_URL: postgresql+psycopg://${POSTGRES_USER:-pokerlab}:${POSTGRES_PASSWORD:-pokerlab_secret}@postgres:5432/${POSTGRES_DB:-pokerlab_dev}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000,http://localhost:3010,http://127.0.0.1:3010,http://localhost:3011,http://127.0.0.1:3011}
+      SOLVER_BIN_PATH: /usr/local/bin/solver
+      SOLVER_SOLUTIONS_DIR: /app/data/solutions
+    volumes:
+      - ./data/solutions:/app/data/solutions:ro
+      - ./apps/api/app:/app/apps/api/app:ro
+    ports:
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+      api:
+        condition: service_healthy
+    environment:
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-pokerlab}:${POSTGRES_PASSWORD:-pokerlab_secret}@postgres:5432/${POSTGRES_DB:-pokerlab_dev}
+      DATABASE_SYNC_URL: postgresql+psycopg://${POSTGRES_USER:-pokerlab}:${POSTGRES_PASSWORD:-pokerlab_secret}@postgres:5432/${POSTGRES_DB:-pokerlab_dev}
+      WORKER_POLL_INTERVAL_SECONDS: 1.0
+      WORKER_CONCURRENCY: 2
+      WORKER_HEARTBEAT_INTERVAL_SECONDS: 5.0
+      WORKER_STALE_TIMEOUT_SECONDS: 30.0
+      SOLVER_BIN_PATH: /usr/local/bin/solver
+      SOLVER_SOLUTIONS_DIR: /app/data/solutions
+    volumes:
+      - ./data/solutions:/app/data/solutions
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:${API_PORT:-8000}/api/v1}
+    container_name: pokerlab-web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${WEB_PORT:-3000}:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:${API_PORT:-8000}/api/v1
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+volumes:
+  postgres_data:
+    driver: local
+  solutions_data:
+    driver: local

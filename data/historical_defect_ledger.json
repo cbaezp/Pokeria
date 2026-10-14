@@ -1,0 +1,65 @@
+[
+  {
+    "defect_id": "DEF-001",
+    "title": "Scenario JSON serialization pot field float/int type instability",
+    "original_failing_reproduction": "PokerScenario.from_dict({'pot': 10, ...}).to_dict() produced pot=10.0, causing canonical hash mismatch in roundtrip",
+    "corrected_invariant": "Integer pot values preserve int type; float values preserve float type; serialization roundtrip is bitwise deterministic",
+    "permanent_regression_test": "tests/unit/poker/test_scenario.py::TestScenarioModel::test_json_roundtrip_serialization",
+    "source_commit": "6661b937bdee5c1dc65660e5fb66b6fcbba1cbe5",
+    "last_passing_execution": "2026-10-10T21:20:26Z"
+  },
+  {
+    "defect_id": "DEF-002",
+    "title": "Assessment item bank unsafe default validation_status fallback",
+    "original_failing_reproduction": "AssessmentItemBank._index_pack_items defaulted missing validation_status to 'VALIDATED', making unvalidated packs authoritative",
+    "corrected_invariant": "Missing or non-VALIDATED status strictly fails closed: is_quarantined=True, supported_tiers=[], validation_status reflects actual or MISSING_VALIDATION_STATUS",
+    "permanent_regression_test": "tests/unit/test_assessment_domain.py::test_missing_or_approximate_validation_status_fails_closed",
+    "source_commit": "4e0e7a9818324b691ecd824cfdde028bd6f589c3",
+    "last_passing_execution": "2026-10-10T21:20:25Z"
+  },
+  {
+    "defect_id": "DEF-003",
+    "title": "Contradictory scenario metadata extraction preflight ordering",
+    "original_failing_reproduction": "Packs with contradictory game_type / tournament metadata crashed in node_extractor.extract_node before quarantine logic was reached",
+    "corrected_invariant": "Metadata validation precedes node extraction; contradictory packs are immediately quarantined without calling extractor",
+    "permanent_regression_test": "tests/unit/training/test_game_identity_isolation.py::TestGameIdentityAndIsolation::test_contradictory_tournament_metadata_quarantines",
+    "source_commit": "6661b937bdee5c1dc65660e5fb66b6fcbba1cbe5",
+    "last_passing_execution": "2026-10-10T21:20:27Z"
+  },
+  {
+    "defect_id": "DEF-004",
+    "title": "Tournament ICM/CSTE categorical grading quarantine",
+    "original_failing_reproduction": "Tournament CSTE decisions were reported with cash-game categorical grades (e.g. STRONG) without mathematical prize-pool calibration",
+    "corrected_invariant": "Raw CSTE action regret is numerically preserved; categorical grade is strictly UNGRADED with status CSTE_POLICY_PENDING",
+    "permanent_regression_test": "tests/unit/training/test_tournament_grading.py::TestTournamentGradingPolicy::test_tournament_cste_decision_never_graded_acceptable",
+    "source_commit": "018a76a7e967765f9214dd50c04086b22e0e8ce1",
+    "last_passing_execution": "2026-10-10T21:20:25Z"
+  },
+  {
+    "defect_id": "DEF-005",
+    "title": "Cash grading regret integrity vs frequency override",
+    "original_failing_reproduction": "Speculative report claimed 0.1679 chips EV loss received STRONG due to frequency >= 20%",
+    "corrected_invariant": "Raw EV loss > 0.10 chips strictly assigns ACCEPTABLE; frequency never overrides raw mathematical regret",
+    "permanent_regression_test": "tests/unit/training/test_grading_engine.py::TestCashGradingPolicyAndBoundaries::test_live_trace_reconciliation_mixed_strategy_acceptable",
+    "source_commit": "018a76a7e967765f9214dd50c04086b22e0e8ce1",
+    "last_passing_execution": "2026-10-10T21:20:26Z"
+  },
+  {
+    "defect_id": "DEF-006",
+    "title": "Playwright analytics test skip on missing ground-truth fixture",
+    "original_failing_reproduction": "analytics_data_integrity.spec.ts skipped when profile e0000000-0000-0000-0000-000000000001 was missing from DB",
+    "corrected_invariant": "Canonical ground-truth fixture seeded into PostgreSQL; both tests execute and pass live with zero skips",
+    "permanent_regression_test": "apps/web/e2e/analytics_data_integrity.spec.ts",
+    "source_commit": "8941aaa2c3bd9381a9ded41fba2010e7dc2cb7f1",
+    "last_passing_execution": "2026-10-10T21:14:50Z"
+  },
+  {
+    "defect_id": "DEF-007",
+    "title": "Rust evaluator ignored tests verification in Linux release container",
+    "original_failing_reproduction": "verify_all_five_card_hands_vs_reference was marked #[ignore] due to debug slowness on host",
+    "corrected_invariant": "Exhaustive evaluation of all 2,598,960 5-card hands and 1M random 7-card hands verified against naive combinatorial oracle with 0 mismatches",
+    "permanent_regression_test": "apps/solver/engine/src/evaluator.rs::tests::verify_all_five_card_hands_vs_reference",
+    "source_commit": "4e0e7a9818324b691ecd824cfdde028bd6f589c3",
+    "last_passing_execution": "2026-10-10T20:37:03Z"
+  }
+]

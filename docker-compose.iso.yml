@@ -1,0 +1,140 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pokerlab-iso-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pokerlab_iso
+      POSTGRES_PASSWORD: pokerlab_iso_secret
+      POSTGRES_DB: pokerlab_iso_db
+    ports:
+      - "127.0.0.1:5440:5432"
+    volumes:
+      - postgres_iso_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pokerlab_iso -d pokerlab_iso_db"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+      start_period: 3s
+
+  migration:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: pokerlab-iso-migration
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_SYNC_URL: postgresql+psycopg://pokerlab_iso:pokerlab_iso_secret@postgres:5432/pokerlab_iso_db
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "[pokerlab-iso-migration] Waiting for PostgreSQL..."
+        python3 -c "
+        import sys, time, psycopg
+        raw_url = '$${DATABASE_SYNC_URL}'
+        url = raw_url.replace('postgresql+psycopg://', 'postgresql://').replace('postgresql+asyncpg://', 'postgresql://')
+        for i in range(30):
+            try:
+                conn = psycopg.connect(url)
+                conn.close()
+                print('[pokerlab-iso-migration] Database ready!')
+                sys.exit(0)
+            except Exception as e:
+                time.sleep(1)
+        sys.exit(1)
+        "
+        echo "[pokerlab-iso-migration] Executing Alembic database migrations..."
+        alembic upgrade head
+        echo "[pokerlab-iso-migration] Database migrations applied successfully."
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: pokerlab-iso-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+    environment:
+      ENVIRONMENT: production
+      LOG_LEVEL: INFO
+      API_PORT: 8000
+      API_HOST: 0.0.0.0
+      DATABASE_URL: postgresql+asyncpg://pokerlab_iso:pokerlab_iso_secret@postgres:5432/pokerlab_iso_db
+      DATABASE_SYNC_URL: postgresql+psycopg://pokerlab_iso:pokerlab_iso_secret@postgres:5432/pokerlab_iso_db
+      CORS_ORIGINS: http://localhost:3012,http://127.0.0.1:3012,http://localhost:3000,http://127.0.0.1:3000
+      SOLVER_BIN_PATH: /usr/local/bin/solver
+      SOLVER_SOLUTIONS_DIR: /app/data/solutions
+    volumes:
+      - solutions_iso_data:/app/data/solutions
+    ports:
+      - "127.0.0.1:8012:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  worker:
+    build:
+      context: .
+      dockerfile: apps/worker/Dockerfile
+    container_name: pokerlab-iso-worker
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+      api:
+        condition: service_healthy
+    environment:
+      ENVIRONMENT: production
+      LOG_LEVEL: INFO
+      DATABASE_URL: postgresql+asyncpg://pokerlab_iso:pokerlab_iso_secret@postgres:5432/pokerlab_iso_db
+      DATABASE_SYNC_URL: postgresql+psycopg://pokerlab_iso:pokerlab_iso_secret@postgres:5432/pokerlab_iso_db
+      WORKER_POLL_INTERVAL_SECONDS: 1.0
+      WORKER_CONCURRENCY: 2
+      WORKER_HEARTBEAT_INTERVAL_SECONDS: 5.0
+      WORKER_STALE_TIMEOUT_SECONDS: 30.0
+      SOLVER_BIN_PATH: /usr/local/bin/solver
+      SOLVER_SOLUTIONS_DIR: /app/data/solutions
+    volumes:
+      - solutions_iso_data:/app/data/solutions
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://127.0.0.1:8012/api/v1
+    container_name: pokerlab-iso-web
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3012:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:8012/api/v1
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_iso_data:
+    driver: local
+  solutions_iso_data:
+    driver: local

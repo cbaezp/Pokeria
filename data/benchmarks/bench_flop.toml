@@ -1,0 +1,17 @@
+board = "Ks 7d 2c"
+oop_range = "AA,KK,77,22,AKs,KQs,KJs,KTs,76s,65s,54s,AKo,KQo"
+ip_range = "AA,KK,QQ,JJ,TT,77,22,AKs,A7s,A2s,KQs,KJs,KTs,QJs,JTs,T9s,98s,87s,76s,AKo"
+effective_stack = 40.0
+starting_pot = 6.0
+raise_cap = 1
+max_iterations = 50
+target_exploitability = 1.0
+
+[sizings.ip.flop]
+bet = { percents = [33.0] }
+
+[sizings.ip.turn]
+bet = { percents = [50.0] }
+
+[sizings.ip.river]
+bet = { percents = [75.0] }

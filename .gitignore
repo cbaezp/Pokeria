@@ -1,0 +1,137 @@
+# ==============================================================================
+# Poker Lab — Root .gitignore
+# ==============================================================================
+
+# Operating System & Filesystem
+.DS_Store
+**/.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+
+# Environment, Local Secrets & Configurations
+.env
+.env.*
+!.env.example
+*.local
+.local/
+.hypothesis/
+*.pem
+*.key
+*.cert
+
+# Python & Virtual Environments
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+**/.venv/
+venv/
+ENV/
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+/lib/
+/lib64/
+!apps/web/src/lib/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Rust & Compiled Native Binaries
+target/
+**/target/
+apps/solver/target/
+**/*.rs.bk
+Cargo.lock.bak
+apps/api/bin/
+bin/
+*.dylib
+*.dll
+*.exe
+*.o
+*.a
+*.rlib
+
+# Node & Next.js Build Artifacts
+node_modules/
+**/node_modules/
+apps/web/node_modules/
+.next/
+**/.next/
+apps/web/.next/
+out/
+apps/web/out/
+*.tsbuildinfo
+**/*.tsbuildinfo
+apps/web/tsconfig.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Testing, Quality & Coverage
+.coverage
+.coverage.*
+coverage/
+htmlcov/
+.pytest_cache/
+**/.pytest_cache/
+.ruff_cache/
+**/.ruff_cache/
+.mypy_cache/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Databases, Storage & Docker Volumes
+*.sqlite3
+*.db
+pgdata/
+postgres_data/
+
+# Solver Solution Trees & Large Binary Artifacts
+# Individual solver solutions exceed GitHub's 100MB file limit (up to 230MB per tree)
+# We preserve manifest.json as the versioned solution catalog
+data/solutions/*
+!data/solutions/manifest.json
+data/solutions/.*
+data/**/*.bin
+*.solution.json
+*.sol
+
+# IDEs & Editor Configuration
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Temporary & Audit Workspace Files
+docker-compose.closure.yml
+docker-compose.override.yml
+*.log
+*.tmp
+*.sample.txt
+scratch/

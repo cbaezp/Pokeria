@@ -1,0 +1,49 @@
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+
+# Python
+.venv
+**/.venv
+__pycache__
+**/__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+**/.pytest_cache
+.ruff_cache
+**/.ruff_cache
+.coverage
+htmlcov
+test-results
+*.db
+*.sqlite3
+
+# Node & Next.js
+node_modules
+**/node_modules
+.next
+**/.next
+apps/web/node_modules
+apps/web/.next
+apps/web/out
+*.tsbuildinfo
+**/*.tsbuildinfo
+playwright-report
+**/playwright-report
+
+# Cargo / Rust
+apps/solver/target
+**/target
+
+# Data & documentation
+pgdata
+docs
+.agents
+*.log
+data/*
+!data/solutions
+apps/api/data
