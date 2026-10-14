@@ -18,9 +18,15 @@ import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PlayingCard } from "@/components/table/PlayingCard";
 import { StrategyModeSelector } from "@/components/training/StrategyModeSelector";
+import { useOptionalGameConfiguration } from "@/lib/game-configuration-context";
 import type { RangeStrategyMode } from "@/types";
 import { PreflopProvenanceDisclosure } from "./PreflopProvenanceDisclosure";
-import { POSITION_RANGES, type Position } from "./rangeBenchmarks";
+import {
+  NINE_MAX_POSITIONS,
+  POSITION_RANGES,
+  type Position,
+  SIX_MAX_POSITIONS,
+} from "./rangeBenchmarks";
 
 export interface DecisionSpot {
   id: string;
@@ -130,12 +136,16 @@ function generateDynamicSpot(
   targetPosition: Position | "MIXED",
   samplingMode: SamplingMode,
   stepIndex: number,
+  availablePositions?: Position[],
 ): DecisionSpot {
-  const positions: Position[] = ["UTG", "HJ", "CO", "BTN", "SB"];
+  const positions: Position[] =
+    availablePositions && availablePositions.length > 0
+      ? availablePositions
+      : ["UTG", "HJ", "CO", "BTN", "SB"];
   const chosenPos: Position =
     targetPosition === "MIXED" ? positions[stepIndex % positions.length] : targetPosition;
 
-  const posData = POSITION_RANGES[chosenPos];
+  const posData = POSITION_RANGES[chosenPos] || POSITION_RANGES.UTG;
   const freqs = posData.frequencies;
 
   let candidateClasses = ALL_169_CLASSES;
@@ -209,6 +219,20 @@ export const OpeningRangeDecisionSession: React.FC<OpeningRangeDecisionSessionPr
   className = "",
   onSessionFinish,
 }) => {
+  const configCtx = useOptionalGameConfiguration();
+
+  const is9Max =
+    configCtx?.activeConfiguration?.table_size === "9-max" ||
+    (configCtx?.activeConfiguration?.positions?.length ?? 6) > 6;
+
+  const dynamicPositions: Position[] = configCtx?.activeConfiguration?.positions
+    ? (configCtx.activeConfiguration.positions.filter(
+        (p) => p !== "BB" && p in POSITION_RANGES,
+      ) as Position[])
+    : is9Max
+      ? NINE_MAX_POSITIONS
+      : SIX_MAX_POSITIONS;
+
   const [selectedPosition, setSelectedPosition] = useState<Position | "MIXED">(initialPosition);
   const [samplingMode, setSamplingMode] = useState<SamplingMode>(initialSamplingMode);
   const [sessionTargetCount, setSessionTargetCount] = useState<number>(targetCount);
@@ -252,7 +276,7 @@ export const OpeningRangeDecisionSession: React.FC<OpeningRangeDecisionSessionPr
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [currentSpot, setCurrentSpot] = useState<DecisionSpot>(() =>
-    generateDynamicSpot(initialPosition, initialSamplingMode, 0),
+    generateDynamicSpot(initialPosition, initialSamplingMode, 0, dynamicPositions),
   );
   const [records, setRecords] = useState<DecisionRecord[]>([]);
   const [currentFeedback, setCurrentFeedback] = useState<DecisionRecord | null>(null);
@@ -264,12 +288,17 @@ export const OpeningRangeDecisionSession: React.FC<OpeningRangeDecisionSessionPr
   // Generate next spot
   const prepareNextSpot = useCallback(
     (nextIndex: number) => {
-      const nextSpot = generateDynamicSpot(selectedPosition, samplingMode, nextIndex);
+      const nextSpot = generateDynamicSpot(
+        selectedPosition,
+        samplingMode,
+        nextIndex,
+        dynamicPositions,
+      );
       setCurrentSpot(nextSpot);
       setCurrentFeedback(null);
       startTimeRef.current = Date.now();
     },
-    [selectedPosition, samplingMode],
+    [selectedPosition, samplingMode, dynamicPositions],
   );
 
   const handleAction = useCallback(
@@ -440,21 +469,24 @@ export const OpeningRangeDecisionSession: React.FC<OpeningRangeDecisionSessionPr
               Opening Range Decision Trainer
             </span>
             <span className="text-xs font-mono text-slate-300">
-              6-Max 100bb Cash RFI · {sessionMode} Mode
+              {is9Max ? "9-Max" : "6-Max"} 100bb Cash RFI · {sessionMode} Mode
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             {/* Position Picker */}
-            <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-[11px] font-mono">
-              {(["MIXED", "UTG", "HJ", "CO", "BTN", "SB"] as const).map((pos) => (
+            <div className="flex flex-wrap items-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-[11px] font-mono">
+              {(["MIXED", ...dynamicPositions] as (Position | "MIXED")[]).map((pos) => (
                 <button
                   key={pos}
                   type="button"
                   onClick={() => {
                     setSelectedPosition(pos);
                     setCurrentIndex(0);
-                    prepareNextSpot(0);
+                    const nextSpot = generateDynamicSpot(pos, samplingMode, 0, dynamicPositions);
+                    setCurrentSpot(nextSpot);
+                    setCurrentFeedback(null);
+                    startTimeRef.current = Date.now();
                   }}
                   className={`px-2 py-0.5 rounded font-bold transition-colors ${
                     selectedPosition === pos

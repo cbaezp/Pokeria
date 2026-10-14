@@ -27,6 +27,24 @@ describe("Opening Range Drills & Recall Exercises", () => {
       expect(screen.getByText(/Correct Threshold Identification!/i)).toBeInTheDocument();
       expect(screen.getByText(/UTG Pocket Pair Boundary: 77\+ pure raise/i)).toBeInTheDocument();
     });
+
+    it("supports 9-max boundary questions for UTG+1, UTG+2, and LJ", () => {
+      render(<BoundaryTrainer position="UTG+1" />);
+      expect(screen.getByText(/UTG\+1 Range Threshold Drills/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Under the Gun \+ 1 \(UTG\+1\) in 9-max 100bb cash/i),
+      ).toBeInTheDocument();
+
+      // Correct option for UTG+1 suited broadway expansion
+      const opt = screen.getByRole("button", { name: /KTs becomes a pure open and QTs is mixed/i });
+      fireEvent.click(opt);
+
+      const confirmBtn = screen.getByRole("button", { name: /Confirm Answer/i });
+      fireEvent.click(confirmBtn);
+
+      expect(screen.getByText(/Correct Threshold Identification!/i)).toBeInTheDocument();
+      expect(screen.getByText(/UTG\+1 Suited Broadway Boundary/i)).toBeInTheDocument();
+    });
   });
 
   describe("RangeReconstructionExercise", () => {
@@ -71,6 +89,19 @@ describe("Opening Range Drills & Recall Exercises", () => {
         screen.getByText(/(Aligned with STANDARD Mode|Reference-Aligned Decision)/i),
       ).toBeInTheDocument();
       randomSpy.mockRestore();
+    });
+
+    it("allows selecting 9-max positions such as UTG+1 and displays position badges", () => {
+      render(
+        <OpeningRangeDecisionSession
+          sessionMode="GUIDED"
+          initialPosition="UTG+1"
+          targetCount={10}
+        />,
+      );
+
+      expect(screen.getByText(/Hero \(UTG\+1\)/i)).toBeInTheDocument();
+      expect(screen.getByText("UTG+1", { selector: "strong" })).toBeInTheDocument();
     });
   });
 

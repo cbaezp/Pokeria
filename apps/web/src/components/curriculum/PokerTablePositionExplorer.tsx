@@ -1,10 +1,10 @@
 "use client";
 
 import { AlertCircle, ArrowRight, CheckCircle2, Info, Users } from "lucide-react";
-import type React from "react";
 import { useState } from "react";
+import { useOptionalGameConfiguration } from "@/lib/game-configuration-context";
 
-export type SeatPosition = "BTN" | "SB" | "BB" | "UTG" | "HJ" | "CO";
+export type SeatPosition = "BTN" | "SB" | "BB" | "UTG" | "UTG+1" | "UTG+2" | "LJ" | "HJ" | "CO";
 
 export interface PositionInfo {
   name: string;
@@ -60,10 +60,43 @@ export const POSITIONS_DATA: Record<SeatPosition, PositionInfo> = {
     postflopOrder: 3,
     category: "Early",
     description:
-      "First to act before the flop with 5 opponents behind. Named because you are 'under pressure'.",
+      "First to act before the flop with opponents behind. Named because you are 'under pressure'.",
     tacticalNote:
-      "Must open a tight, disciplined range of ~15% (strong pairs and high broadways) to avoid getting re-raised.",
+      "Must open a tight, disciplined range of ~11-15% (strong pairs and high broadways) to avoid getting re-raised.",
     color: "bg-blue-600",
+  },
+  "UTG+1": {
+    name: "UTG+1",
+    fullName: "Under the Gun + 1",
+    preflopOrder: 2,
+    postflopOrder: 4,
+    category: "Early",
+    description: "Second player to act preflop in a 9-max game. Still faces 7 opponents behind.",
+    tacticalNote:
+      "Opens ~13.2% of hands. Marginally expands beyond UTG with hands like KTs and small pairs.",
+    color: "bg-blue-500",
+  },
+  "UTG+2": {
+    name: "UTG+2",
+    fullName: "Under the Gun + 2",
+    preflopOrder: 3,
+    postflopOrder: 5,
+    category: "Early",
+    description: "Third seat to act preflop in a full-ring / 9-max game.",
+    tacticalNote:
+      "Opens ~15.0% of hands. Expands pocket pair opens to include 66 pure and suited broadways.",
+    color: "bg-cyan-600",
+  },
+  LJ: {
+    name: "LJ",
+    fullName: "The LoJack",
+    preflopOrder: 4,
+    postflopOrder: 6,
+    category: "Middle",
+    description: "Middle position seat in full ring / 9-max games directly preceding the Hijack.",
+    tacticalNote:
+      "Opens ~16.3% of hands. Bridges early position discipline with middle position aggression.",
+    color: "bg-teal-600",
   },
   HJ: {
     name: "HJ",
@@ -72,9 +105,9 @@ export const POSITIONS_DATA: Record<SeatPosition, PositionInfo> = {
     postflopOrder: 4,
     category: "Middle",
     description:
-      "Middle position seat between UTG and the Cutoff. Begins the transition to looser play.",
+      "Middle position seat between UTG/LJ and the Cutoff. Begins the transition to looser play.",
     tacticalNote:
-      "Opens ~20-22% of hands; 'hijacks' the pot before the traditional late-position stealers.",
+      "Opens ~18-22% of hands; 'hijacks' the pot before the traditional late-position stealers.",
     color: "bg-indigo-600",
   },
   CO: {
@@ -93,6 +126,7 @@ export const POSITIONS_DATA: Record<SeatPosition, PositionInfo> = {
 
 interface PokerTablePositionExplorerProps {
   interactive?: boolean;
+  tableSize?: 6 | 9;
   highlightSeats?: SeatPosition[];
   heroPosition?: SeatPosition;
   showOrder?: boolean;
@@ -103,6 +137,7 @@ interface PokerTablePositionExplorerProps {
 
 export const PokerTablePositionExplorer: React.FC<PokerTablePositionExplorerProps> = ({
   interactive = true,
+  tableSize,
   highlightSeats,
   heroPosition,
   showOrder = true,
@@ -110,20 +145,64 @@ export const PokerTablePositionExplorer: React.FC<PokerTablePositionExplorerProp
   onSeatSelect,
   className = "",
 }) => {
+  const configCtx = useOptionalGameConfiguration();
+
+  const effectiveTableSize: 6 | 9 =
+    tableSize ??
+    (configCtx?.activeConfiguration?.table_size === "9-max" ||
+    (configCtx?.activeConfiguration?.positions?.length ?? 6) > 6
+      ? 9
+      : 6);
+
   const [selectedSeat, setSelectedSeat] = useState<SeatPosition>(heroPosition || "BTN");
   const [orderMode, setOrderMode] = useState<"preflop" | "postflop">("preflop");
   const [taskAnswered, setTaskAnswered] = useState<boolean | null>(null);
 
-  const seatOrder: SeatPosition[] = ["SB", "BB", "UTG", "HJ", "CO", "BTN"];
+  const seatOrder6: SeatPosition[] = ["SB", "BB", "UTG", "HJ", "CO", "BTN"];
+  const seatOrder9: SeatPosition[] = ["SB", "BB", "UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN"];
 
-  // Elliptical coordinate layout for 6-max seats around table
-  const seatPositions: Record<SeatPosition, { top: string; left: string; transform: string }> = {
+  const seatOrder = effectiveTableSize === 9 ? seatOrder9 : seatOrder6;
+
+  // Elliptical coordinate layout for seats around table
+  const seatPositions6: Record<string, { top: string; left: string; transform: string }> = {
     BB: { top: "10%", left: "28%", transform: "translate(-50%, -50%)" },
     UTG: { top: "10%", left: "72%", transform: "translate(-50%, -50%)" },
     HJ: { top: "50%", left: "93%", transform: "translate(-50%, -50%)" },
     CO: { top: "90%", left: "72%", transform: "translate(-50%, -50%)" },
     BTN: { top: "90%", left: "28%", transform: "translate(-50%, -50%)" },
     SB: { top: "50%", left: "7%", transform: "translate(-50%, -50%)" },
+  };
+
+  const seatPositions9: Record<string, { top: string; left: string; transform: string }> = {
+    SB: { top: "50%", left: "7%", transform: "translate(-50%, -50%)" },
+    BB: { top: "16%", left: "18%", transform: "translate(-50%, -50%)" },
+    UTG: { top: "9%", left: "40%", transform: "translate(-50%, -50%)" },
+    "UTG+1": { top: "9%", left: "62%", transform: "translate(-50%, -50%)" },
+    "UTG+2": { top: "20%", left: "84%", transform: "translate(-50%, -50%)" },
+    LJ: { top: "52%", left: "93%", transform: "translate(-50%, -50%)" },
+    HJ: { top: "82%", left: "84%", transform: "translate(-50%, -50%)" },
+    CO: { top: "91%", left: "60%", transform: "translate(-50%, -50%)" },
+    BTN: { top: "88%", left: "32%", transform: "translate(-50%, -50%)" },
+  };
+
+  const seatPositions = effectiveTableSize === 9 ? seatPositions9 : seatPositions6;
+
+  const getPreflopOrder = (pos: SeatPosition): number => {
+    if (effectiveTableSize === 9) {
+      const order: SeatPosition[] = ["UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
+      return order.indexOf(pos) + 1;
+    }
+    const order: SeatPosition[] = ["UTG", "HJ", "CO", "BTN", "SB", "BB"];
+    return order.indexOf(pos) + 1;
+  };
+
+  const getPostflopOrder = (pos: SeatPosition): number => {
+    if (effectiveTableSize === 9) {
+      const order: SeatPosition[] = ["SB", "BB", "UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN"];
+      return order.indexOf(pos) + 1;
+    }
+    const order: SeatPosition[] = ["SB", "BB", "UTG", "HJ", "CO", "BTN"];
+    return order.indexOf(pos) + 1;
   };
 
   const handleSeatClick = (seat: SeatPosition) => {
@@ -135,7 +214,7 @@ export const PokerTablePositionExplorer: React.FC<PokerTablePositionExplorerProp
     }
   };
 
-  const currentInfo = POSITIONS_DATA[selectedSeat];
+  const currentInfo = POSITIONS_DATA[selectedSeat] || POSITIONS_DATA.BTN;
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -208,7 +287,7 @@ export const PokerTablePositionExplorer: React.FC<PokerTablePositionExplorerProp
         <div className="absolute inset-3 rounded-[90px] border-2 border-emerald-600/30 pointer-events-none" />
         <div className="absolute inset-5 rounded-[80px] border border-emerald-500/20 pointer-events-none flex items-center justify-center">
           <div className="text-emerald-500/25 font-black text-xs sm:text-sm tracking-widest uppercase">
-            Pokeria 6-Max Table
+            Pokeria {effectiveTableSize}-Max Table
           </div>
         </div>
 
@@ -221,13 +300,13 @@ export const PokerTablePositionExplorer: React.FC<PokerTablePositionExplorerProp
           D
         </div>
 
-        {/* 6 Seats Rendered Around Oval */}
+        {/* Seats Rendered Around Oval */}
         {seatOrder.map((pos) => {
           const info = POSITIONS_DATA[pos];
           const coords = seatPositions[pos];
           const isSelected = selectedSeat === pos;
           const isHighlighted = highlightSeats ? highlightSeats.includes(pos) : false;
-          const orderNum = orderMode === "preflop" ? info.preflopOrder : info.postflopOrder;
+          const orderNum = orderMode === "preflop" ? getPreflopOrder(pos) : getPostflopOrder(pos);
 
           return (
             <button
@@ -282,10 +361,11 @@ export const PokerTablePositionExplorer: React.FC<PokerTablePositionExplorerProp
 
           <div className="flex items-center gap-3 text-xs font-mono text-slate-300">
             <span>
-              Preflop: <strong className="text-amber-400">#{currentInfo.preflopOrder}</strong>
+              Preflop: <strong className="text-amber-400">#{getPreflopOrder(selectedSeat)}</strong>
             </span>
             <span>
-              Postflop: <strong className="text-emerald-400">#{currentInfo.postflopOrder}</strong>
+              Postflop:{" "}
+              <strong className="text-emerald-400">#{getPostflopOrder(selectedSeat)}</strong>
             </span>
           </div>
         </div>

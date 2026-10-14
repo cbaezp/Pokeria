@@ -89,7 +89,7 @@ class TestProfileEndpoints:
         # Create profile
         p_res = await client.post(
             "/api/v1/profiles",
-            json={"username": "grinder", "display_name": "Grinder", "email": "grind@pokerlab.test"},
+            json={"username": "grinder", "display_name": "Grinder", "email": "grind@pokerlab.io"},
         )
         pid = p_res.json()["id"]
 

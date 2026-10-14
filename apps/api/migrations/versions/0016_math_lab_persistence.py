@@ -75,12 +75,8 @@ def upgrade() -> None:
             unique=True,
             index=True,
         ),
-        sa.Column(
-            "completed_modules", sa.JSON(), nullable=False, server_default=sa.text("'[]'::json")
-        ),
-        sa.Column(
-            "mastered_topics", sa.JSON(), nullable=False, server_default=sa.text("'[]'::json")
-        ),
+        sa.Column("completed_modules", sa.JSON(), nullable=False, server_default=sa.text("'[]'")),
+        sa.Column("mastered_topics", sa.JSON(), nullable=False, server_default=sa.text("'[]'")),
         sa.Column(
             "current_module_id", sa.String(64), nullable=False, server_default="mod_01_arithmetic"
         ),

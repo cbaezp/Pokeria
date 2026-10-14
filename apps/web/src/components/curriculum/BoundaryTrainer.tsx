@@ -14,10 +14,11 @@ import { useState } from "react";
 import { StrategyModeSelector } from "@/components/training/StrategyModeSelector";
 import type { RangeStrategyMode } from "@/types";
 import { PreflopProvenanceDisclosure } from "./PreflopProvenanceDisclosure";
+import type { Position } from "./rangeBenchmarks";
 
 export interface BoundaryExercise {
   id: string;
-  position: "UTG" | "HJ" | "CO" | "BTN" | "SB";
+  position: Position;
   family: string;
   question: string;
   options: string[];
@@ -39,6 +40,56 @@ export const CANONICAL_BOUNDARY_EXERCISES: BoundaryExercise[] = [
     explanation:
       "77 is the lowest pocket pair opened at 100% frequency from UTG. 66 and 55 are mixed low-frequency opens, and 44-22 are pure folds.",
     boundaryRule: "UTG Pocket Pair Boundary: 77+ pure raise, 66-55 mixed, 44-22 pure fold.",
+    category: "EDGE_OF_FAMILY",
+  },
+  {
+    id: "bnd-utg1-suited-broadways",
+    position: "UTG+1",
+    family: "Suited Broadways",
+    question:
+      "Under the Gun + 1 (UTG+1) in 9-max 100bb cash: How do suited broadways expand relative to UTG?",
+    options: [
+      "KTs becomes a pure open and QTs is mixed (~60%)",
+      "All suited jacks become pure opens",
+      "K9s and Q9s become pure opens",
+      "No change; UTG+1 opens the exact same hands as UTG",
+    ],
+    correctIndex: 0,
+    explanation:
+      "In 9-max, UTG+1 slightly loosens discipline from UTG (~13.2% vs ~11.5%), establishing KTs as a pure raise while adding QTs as a high-frequency mixed open.",
+    boundaryRule: "UTG+1 Suited Broadway Boundary: ATs+, KTs+, QJs pure open; QTs mixed (~60%).",
+    category: "POSITION_ADDITION",
+  },
+  {
+    id: "bnd-utg2-pocket-pairs",
+    position: "UTG+2",
+    family: "Pocket Pairs",
+    question:
+      "Under the Gun + 2 (UTG+2) in 9-max 100bb cash: Which pocket pair joins 77+ as a pure open?",
+    options: ["66", "44", "33", "22"],
+    correctIndex: 0,
+    explanation:
+      "At UTG+2 (~15.0% open frequency), 66 transitions from a low-frequency mix to a full pure raise, while 55 becomes a frequent mixed open.",
+    boundaryRule:
+      "UTG+2 Pocket Pair Boundary: 66+ pure open; 55 mixed (~70%); 44-22 mixed-to-fold.",
+    category: "EDGE_OF_FAMILY",
+  },
+  {
+    id: "bnd-lj-rfi-frequency",
+    position: "LJ",
+    family: "Middle Position Strategy",
+    question: "In 9-max play, what is the role and benchmark open frequency of the LoJack (LJ)?",
+    options: [
+      "Bridges early and middle position with ~16.3% RFI frequency",
+      "Plays tightest at the table with ~9% RFI frequency",
+      "Plays identically to the Button with ~42% RFI frequency",
+      "Acts as the third blind position with no opening range",
+    ],
+    correctIndex: 0,
+    explanation:
+      "The LoJack (LJ) is the seat right before the Hijack in full-ring / 9-max games, opening ~16.3% of hands (~216 combos) to bridge early position discipline with middle position aggression.",
+    boundaryRule:
+      "9-Max RFI Hierarchy: UTG (~11.5%) → UTG+1 (~13.2%) → UTG+2 (~15.0%) → LJ (~16.3%) → HJ (~18.2%).",
     category: "EDGE_OF_FAMILY",
   },
   {
@@ -99,7 +150,7 @@ export const CANONICAL_BOUNDARY_EXERCISES: BoundaryExercise[] = [
 ];
 
 export interface BoundaryTrainerProps {
-  position?: "UTG" | "HJ" | "CO" | "BTN" | "SB";
+  position?: Position;
   className?: string;
   onComplete?: (score: number) => void;
 }

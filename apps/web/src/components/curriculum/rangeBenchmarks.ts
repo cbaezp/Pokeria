@@ -1,4 +1,4 @@
-export type Position = "UTG" | "HJ" | "CO" | "BTN" | "SB";
+export type Position = "UTG" | "UTG+1" | "UTG+2" | "LJ" | "HJ" | "CO" | "BTN" | "SB";
 
 export interface RangeProvenanceMetadata {
   referenceId: string;
@@ -25,6 +25,9 @@ export const PREFLOP_PROVENANCE_METADATA: RangeProvenanceMetadata = {
   rakeStructure: "5.0% with 3.0 BB Cap (No Flop, No Drop)",
   openSizingBb: {
     UTG: 2.5,
+    "UTG+1": 2.5,
+    "UTG+2": 2.5,
+    LJ: 2.5,
     HJ: 2.5,
     CO: 2.5,
     BTN: 2.5,
@@ -110,6 +113,80 @@ const UTG_FREQUENCIES: Record<string, number> = {
   "87s": 0.5,
   "76s": 0.3,
   "65s": 0.2,
+};
+
+// 1b. UTG+1 Benchmark (39 classes, ~175.2 weighted combos)
+const UTG1_FREQUENCIES: Record<string, number> = {
+  ...UTG_FREQUENCIES,
+  "66": 0.8,
+  "55": 0.4,
+  A5s: 0.8,
+  A4s: 0.7,
+  A3s: 0.4,
+  AJo: 1.0,
+  ATo: 0.4,
+  KQo: 1.0,
+  KJo: 0.3,
+  K9s: 0.4,
+  Q9s: 0.3,
+  J9s: 0.3,
+  T9s: 1.0,
+  "98s": 1.0,
+  "87s": 0.7,
+  "76s": 0.5,
+  "65s": 0.3,
+};
+
+// 1c. UTG+2 Benchmark (44 classes, ~198.8 weighted combos)
+const UTG2_FREQUENCIES: Record<string, number> = {
+  ...UTG1_FREQUENCIES,
+  "66": 1.0,
+  "55": 0.6,
+  "44": 0.3,
+  A9s: 0.8,
+  A8s: 0.4,
+  A5s: 1.0,
+  A4s: 0.9,
+  A3s: 0.5,
+  A2s: 0.3,
+  ATo: 0.6,
+  A9o: 0.1,
+  K9s: 0.6,
+  Q9s: 0.5,
+  J9s: 0.5,
+  T8s: 0.3,
+  KJo: 0.5,
+  QJo: 0.3,
+  "87s": 0.9,
+  "76s": 0.6,
+  "65s": 0.5,
+  "54s": 0.2,
+};
+
+// 1d. LJ Benchmark (47 classes, ~216.4 weighted combos)
+const LJ_FREQUENCIES: Record<string, number> = {
+  ...UTG2_FREQUENCIES,
+  "55": 0.8,
+  "44": 0.4,
+  "33": 0.2,
+  A9s: 1.0,
+  A8s: 0.6,
+  A7s: 0.3,
+  A6s: 0.2,
+  A4s: 1.0,
+  A3s: 0.6,
+  A2s: 0.4,
+  ATo: 0.7,
+  K9s: 0.7,
+  Q9s: 0.6,
+  J9s: 0.7,
+  T8s: 0.5,
+  KJo: 0.6,
+  QJo: 0.4,
+  "87s": 1.0,
+  "76s": 0.7,
+  "65s": 0.6,
+  "54s": 0.3,
 };
 
 // 2. HJ / Middle Position Benchmark (49 classes, 230.8 weighted combos, 286 unweighted, 254 simplified)
@@ -354,16 +431,52 @@ export const POSITION_DATA: Record<Position, PositionRangeData> = {
     "text-emerald-400",
     UTG_FREQUENCIES,
   ),
+  "UTG+1": buildPositionData(
+    "UTG+1",
+    "UTG+1",
+    "Under The Gun +1",
+    2.5,
+    "Tight Linear Core Expansion",
+    "teal",
+    "bg-teal-500/20",
+    "border-teal-500/30",
+    "text-teal-400",
+    UTG1_FREQUENCIES,
+  ),
+  "UTG+2": buildPositionData(
+    "UTG+2",
+    "UTG+2",
+    "Under The Gun +2 (MP1)",
+    2.5,
+    "Early Middle Position Value",
+    "cyan",
+    "bg-cyan-500/20",
+    "border-cyan-500/30",
+    "text-cyan-400",
+    UTG2_FREQUENCIES,
+  ),
+  LJ: buildPositionData(
+    "LJ",
+    "LJ",
+    "Lojack (Middle Position 2)",
+    2.5,
+    "Linear Value Transition",
+    "blue",
+    "bg-blue-500/20",
+    "border-blue-500/30",
+    "text-blue-400",
+    LJ_FREQUENCIES,
+  ),
   HJ: buildPositionData(
     "HJ",
     "HJ",
     "Hijack (Middle Position)",
     2.5,
     "Linear Value Expansion",
-    "teal",
-    "bg-teal-500/20",
-    "border-teal-500/30",
-    "text-teal-400",
+    "indigo",
+    "bg-indigo-500/20",
+    "border-indigo-500/30",
+    "text-indigo-400",
     HJ_FREQUENCIES,
   ),
   CO: buildPositionData(
@@ -372,10 +485,10 @@ export const POSITION_DATA: Record<Position, PositionRangeData> = {
     "Cutoff",
     2.5,
     "Expanded Value & Playability",
-    "indigo",
-    "bg-indigo-500/20",
-    "border-indigo-500/30",
-    "text-indigo-400",
+    "violet",
+    "bg-violet-500/20",
+    "border-violet-500/30",
+    "text-violet-400",
     CO_FREQUENCIES,
   ),
   BTN: buildPositionData(
@@ -404,11 +517,26 @@ export const POSITION_DATA: Record<Position, PositionRangeData> = {
   ),
 };
 
-export const POSITION_ORDER: Position[] = ["UTG", "HJ", "CO", "BTN", "SB"];
+export const SIX_MAX_POSITIONS: Position[] = ["UTG", "HJ", "CO", "BTN", "SB"];
+export const EIGHT_MAX_POSITIONS: Position[] = ["UTG", "UTG+1", "LJ", "HJ", "CO", "BTN", "SB"];
+export const NINE_MAX_POSITIONS: Position[] = [
+  "UTG",
+  "UTG+1",
+  "UTG+2",
+  "LJ",
+  "HJ",
+  "CO",
+  "BTN",
+  "SB",
+];
+export const POSITION_ORDER: Position[] = NINE_MAX_POSITIONS;
 export const POSITION_RANGES = POSITION_DATA;
 
 // Export preset hands for backward compatibility (using all open hands)
 export const UTG_PRESET_HANDS = POSITION_DATA.UTG.hands;
+export const UTG1_PRESET_HANDS = POSITION_DATA["UTG+1"].hands;
+export const UTG2_PRESET_HANDS = POSITION_DATA["UTG+2"].hands;
+export const LJ_PRESET_HANDS = POSITION_DATA.LJ.hands;
 export const HJ_PRESET_HANDS = POSITION_DATA.HJ.hands;
 export const CO_PRESET_HANDS = POSITION_DATA.CO.hands;
 export const BTN_PRESET_HANDS = POSITION_DATA.BTN.hands;

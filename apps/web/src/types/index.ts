@@ -1572,7 +1572,8 @@ export interface LiveHelperScenario {
 }
 
 export interface LiveHelperTemplate {
-  template_id: string;
+  template_id?: string;
+  id?: string;
   title: string;
   category:
     | "PREFLOP_OPEN"
@@ -1580,17 +1581,26 @@ export interface LiveHelperTemplate {
     | "3BET_4BET_SQUEEZE"
     | "ALL_IN_SHOVE"
     | "POSTFLOP_TEXTURES"
-    | "TOURNAMENT_ICM_PKO";
-  description: string;
-  configuration: LiveHelperConfig;
+    | "TOURNAMENT_ICM_PKO"
+    | "PREFLOP_RFI"
+    | "PREFLOP_AGGRESSION"
+    | "POSTFLOP"
+    | "TOURNAMENT"
+    | string;
+  description?: string;
+  summary?: string;
+  configuration?: LiveHelperConfig;
+  config?: LiveHelperConfig;
   button_seat: number;
   seats: LiveHelperSeat[];
   actions: LiveHelperAction[];
   board: string[];
   hero_seat: number;
   hero_cards: string[];
-  suggested_action: string;
-  tags: string[];
+  suggested_action?: string;
+  tags?: string[];
+  street?: string;
+  learning_notes?: string;
 }
 
 export interface LiveHelperInsights {
