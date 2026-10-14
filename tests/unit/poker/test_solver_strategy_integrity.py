@@ -166,9 +166,9 @@ def test_selective_node_extractor_dual_index_formats() -> None:
     # 1. Direct Node Dictionary Format (e.g., 64bf1668d802a75d)
     direct_pack = "64bf1668d802a75d"
     direct_nids = extractor.get_indexed_node_ids(direct_pack)
-    assert (
-        len(direct_nids) == 1349
-    ), f"Expected 1,349 nodes for {direct_pack}, got {len(direct_nids)}"
+    assert len(direct_nids) == 1349, (
+        f"Expected 1,349 nodes for {direct_pack}, got {len(direct_nids)}"
+    )
     assert 0 in direct_nids
     assert 1759 in direct_nids
 
@@ -181,9 +181,9 @@ def test_selective_node_extractor_dual_index_formats() -> None:
     # 2. Chunked Offset Index Format (e.g., cert_cash_flop_cbet_ae73a18d60ad9965)
     offset_pack = "cert_cash_flop_cbet_ae73a18d60ad9965"
     offset_nids = extractor.get_indexed_node_ids(offset_pack)
-    assert (
-        len(offset_nids) == 99573
-    ), f"Expected 99,573 nodes for {offset_pack}, got {len(offset_nids)}"
+    assert len(offset_nids) == 99573, (
+        f"Expected 99,573 nodes for {offset_pack}, got {len(offset_nids)}"
+    )
     assert 0 in offset_nids
 
     node_offset = extractor.extract_node(offset_pack, 0)

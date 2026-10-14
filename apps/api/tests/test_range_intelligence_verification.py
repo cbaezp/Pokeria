@@ -42,9 +42,9 @@ def test_phase_1_range_coverage_and_combo_weighting():
             for s in catalog.list_all_scenarios()
             if getattr(s, "street", "") == "preflop" and s.hero_position == pos
         ]
-        assert (
-            len(pos_scenarios) == 169
-        ), f"Expected 169 hand classes for {pos}, got {len(pos_scenarios)}"
+        assert len(pos_scenarios) == 169, (
+            f"Expected 169 hand classes for {pos}, got {len(pos_scenarios)}"
+        )
 
         # Check total combo weight sums to exactly 1,326
         total_combos = 0
@@ -113,9 +113,9 @@ def test_phase_1_and_4_no_fabricated_ev_and_mode_segregation():
         strategy_mode="SIMPLIFIED",
         strategy_threshold=0.5,
     )
-    assert (
-        simp_50_eval.derived_simplified_action == "RAISE"
-    ), "50% inclusive threshold must designate RAISE"
+    assert simp_50_eval.derived_simplified_action == "RAISE", (
+        "50% inclusive threshold must designate RAISE"
+    )
     assert simp_50_eval.grade == GradeCategory.BEST
 
     # Below 50% raise frequency: Fold is derived action
@@ -176,12 +176,12 @@ def test_phase_2_and_4_mastery_dimensions_and_isolation():
     assert dims["simplified_range_recall"].competence_score >= 0.85
 
     # Mixed-Frequency Knowledge and Calibration must NOT be awarded
-    assert (
-        dims["mixed_frequency_knowledge"].competence_score is None
-    ), "Simplified >=50% accuracy must NOT award Mixed-Frequency Knowledge"
-    assert (
-        dims["mixed_frequency_execution_calibration"].competence_score is None
-    ), "Simplified >=50% accuracy must NOT award Mixed-Frequency Calibration"
+    assert dims["mixed_frequency_knowledge"].competence_score is None, (
+        "Simplified >=50% accuracy must NOT award Mixed-Frequency Knowledge"
+    )
+    assert dims["mixed_frequency_execution_calibration"].competence_score is None, (
+        "Simplified >=50% accuracy must NOT award Mixed-Frequency Calibration"
+    )
 
     # Solver-based EV performance must remain unawarded
     assert dims["solver_based_ev_performance"].competence_score is None
@@ -218,9 +218,9 @@ def test_phase_2_and_4_mastery_dimensions_and_isolation():
 
     # 16 raw repetitions with w_k = 1 / sqrt(k): sum(1/sqrt(k) for k in 1..16) ~ 7.07
     eff_samples = sum(1.0 / (k**0.5) for k in range(1, 17))
-    assert (
-        eff_samples < 8.0
-    ), "Repetition discounting must shrink 16 identical attempts to < 8.0 effective samples"
+    assert eff_samples < 8.0, (
+        "Repetition discounting must shrink 16 identical attempts to < 8.0 effective samples"
+    )
     print(
         "✓ Phase 2 & 4: 8 mastery dimensions, anti-overconfidence repetition discounting, and metric isolation verified!"
     )
@@ -291,12 +291,12 @@ def test_phase_3_weakness_detection_and_adaptive_sampling():
     assert len(weaknesses) > 0, "Expected at least one detected weakness"
     top_weakness = weaknesses[0]
     assert top_weakness.position == "UTG", f"Expected UTG weakness, got {top_weakness.position}"
-    assert (
-        top_weakness.hand_family == "Suited Aces"
-    ), f"Expected Suited Aces, got {top_weakness.hand_family}"
-    assert (
-        top_weakness.error_rate >= 0.75
-    ), f"Expected high error rate, got {top_weakness.error_rate}"
+    assert top_weakness.hand_family == "Suited Aces", (
+        f"Expected Suited Aces, got {top_weakness.hand_family}"
+    )
+    assert top_weakness.error_rate >= 0.75, (
+        f"Expected high error rate, got {top_weakness.error_rate}"
+    )
     assert "A2s" in top_weakness.problematic_hands or "A3s" in top_weakness.problematic_hands
 
     # Verify Adaptive Recommendation formulation
@@ -334,9 +334,9 @@ def test_phase_3_weakness_detection_and_adaptive_sampling():
 
     # 60% of 50 = 30 targeted
     assert targeted_count >= 25, f"Expected at least 25 targeted hands, got {targeted_count}"
-    assert (
-        interleaved_count >= 15
-    ), f"Expected at least 15 representative interleaved hands, got {interleaved_count}"
+    assert interleaved_count >= 15, (
+        f"Expected at least 15 representative interleaved hands, got {interleaved_count}"
+    )
     print(
         f"✓ Phase 3: Controlled UTG suited ace weakness correctly detected! Adaptive sampling delivered {targeted_count} targeted / {interleaved_count} interleaved hands."
     )

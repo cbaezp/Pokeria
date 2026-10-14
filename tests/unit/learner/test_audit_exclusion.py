@@ -222,9 +222,9 @@ class TestAuditExclusion:
                 is_test_profile = False
 
             # Profile is NOT disqualified
-            assert (
-                is_disqualified_profile(LegitProfile()) is False
-            ), f"Profile {uname} was falsely disqualified!"
+            assert is_disqualified_profile(LegitProfile()) is False, (
+                f"Profile {uname} was falsely disqualified!"
+            )
 
             # Decisions under this profile are eligible
             elig = check_decision_eligibility(
@@ -240,9 +240,9 @@ class TestAuditExclusion:
             # Feature extractor emits training samples
             dec = make_decision(profile_id=f"prof_{uname}", is_test=False)
             samples = extractor.extract_causal_dataset([dec], profile_is_test=False)
-            assert (
-                len(samples) == 1
-            ), f"Feature extractor failed to emit sample for genuine user {uname}"
+            assert len(samples) == 1, (
+                f"Feature extractor failed to emit sample for genuine user {uname}"
+            )
 
     def test_untrusted_and_malicious_observation_provenance_fails_closed(self) -> None:
         """Adversarial check: Untrusted, synthetic, or spoofed observation origins fail closed."""

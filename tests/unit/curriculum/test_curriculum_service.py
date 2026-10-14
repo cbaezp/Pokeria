@@ -28,9 +28,9 @@ class TestSkillTaxonomyUnit:
 
         for s in skills:
             for prereq_id in s.prerequisite_ids:
-                assert (
-                    prereq_id in all_ids
-                ), f"Prerequisite {prereq_id} for skill {s.id} does not exist!"
+                assert prereq_id in all_ids, (
+                    f"Prerequisite {prereq_id} for skill {s.id} does not exist!"
+                )
                 assert prereq_id != s.id, f"Self-referential prerequisite on {s.id}"
 
     def test_domain_filtering_and_coverage_status(self):
@@ -74,9 +74,9 @@ class TestCurriculumLessonsUnit:
 
         path_ids = {p.id for p in paths}
         for lesson in lessons:
-            assert (
-                lesson.path_id in path_ids
-            ), f"Lesson {lesson.id} assigned to nonexistent path {lesson.path_id}"
+            assert lesson.path_id in path_ids, (
+                f"Lesson {lesson.id} assigned to nonexistent path {lesson.path_id}"
+            )
             assert len(lesson.steps) >= 1
 
     def test_prerequisite_unlocking_logic(self):

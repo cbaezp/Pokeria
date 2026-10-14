@@ -792,9 +792,9 @@ class GameState:
 
         # Invariant check
         final_total = sum(p.stack for p in final_players)
-        assert (
-            final_total == self.total_starting_chips
-        ), f"Chip conservation error: started with {self.total_starting_chips}, ended with {final_total}"
+        assert final_total == self.total_starting_chips, (
+            f"Chip conservation error: started with {self.total_starting_chips}, ended with {final_total}"
+        )
 
         return GameState(
             config=self.config,
@@ -861,9 +861,9 @@ class GameState:
         )
 
         final_total = sum(p.stack for p in final_players)
-        assert (
-            final_total == self.total_starting_chips
-        ), f"Chip conservation error: started with {self.total_starting_chips}, ended with {final_total}"
+        assert final_total == self.total_starting_chips, (
+            f"Chip conservation error: started with {self.total_starting_chips}, ended with {final_total}"
+        )
 
         return GameState(
             config=self.config,

@@ -63,9 +63,9 @@ async def main():
         position="BTN",
         provenance="ILLUSTRATIVE_PRACTICE_CHART_100BB_6MAX",
     )
-    assert (
-        eval_preflop.raw_ev_loss is None
-    ), f"Expected None ev_loss, got {eval_preflop.raw_ev_loss}"
+    assert eval_preflop.raw_ev_loss is None, (
+        f"Expected None ev_loss, got {eval_preflop.raw_ev_loss}"
+    )
     assert eval_preflop.chosen_action_ev is None
     assert eval_preflop.best_action_ev is None
     assert eval_preflop.grading_status == "PRACTICE"
@@ -83,9 +83,9 @@ async def main():
         reference_actions=solver_ref,
         validation_status="FAILED",
     )
-    assert (
-        eval_unvalidated.raw_ev_loss is None
-    ), f"Expected None ev_loss, got {eval_unvalidated.raw_ev_loss}"
+    assert eval_unvalidated.raw_ev_loss is None, (
+        f"Expected None ev_loss, got {eval_unvalidated.raw_ev_loss}"
+    )
     assert eval_unvalidated.chosen_action_ev is None
     assert eval_unvalidated.best_action_ev is None
     assert eval_unvalidated.grading_status == "UNGRADED"

@@ -154,12 +154,12 @@ async def run_live_audit():
         f"  -> eval_b provenance: {eval_b.get('grading_provenance')}, status: {eval_b.get('grading_status')}"
     )
     assert eval_b["raw_ev_loss"] is None, f"Expected None raw_ev_loss, got {eval_b['raw_ev_loss']}"
-    assert (
-        eval_b["chosen_action_ev"] is None
-    ), f"Expected None chosen_ev, got {eval_b['chosen_action_ev']}"
-    assert (
-        eval_b["best_action_ev"] is None
-    ), f"Expected None best_ev, got {eval_b['best_action_ev']}"
+    assert eval_b["chosen_action_ev"] is None, (
+        f"Expected None chosen_ev, got {eval_b['chosen_action_ev']}"
+    )
+    assert eval_b["best_action_ev"] is None, (
+        f"Expected None best_ev, got {eval_b['best_action_ev']}"
+    )
     assert eval_b["grading_status"] == "PRACTICE"
     assert eval_b["grading_provenance"] in (
         "INSTRUCTIONAL_HEURISTIC",
@@ -226,15 +226,15 @@ async def run_live_audit():
         print("  -> Verified: Solver row has non-null numeric chosen_ev, best_ev, and ev_loss.")
 
         # Check preflop row
-        assert (
-            preflop_row["ev_loss"] is None
-        ), f"Preflop ev_loss must be NULL, got {preflop_row['ev_loss']}"
-        assert (
-            preflop_row["chosen_ev"] is None
-        ), f"Preflop chosen_ev must be NULL, got {preflop_row['chosen_ev']}"
-        assert (
-            preflop_row["best_ev"] is None
-        ), f"Preflop best_ev must be NULL, got {preflop_row['best_ev']}"
+        assert preflop_row["ev_loss"] is None, (
+            f"Preflop ev_loss must be NULL, got {preflop_row['ev_loss']}"
+        )
+        assert preflop_row["chosen_ev"] is None, (
+            f"Preflop chosen_ev must be NULL, got {preflop_row['chosen_ev']}"
+        )
+        assert preflop_row["best_ev"] is None, (
+            f"Preflop best_ev must be NULL, got {preflop_row['best_ev']}"
+        )
         assert preflop_row["grading_provenance"] in (
             "INSTRUCTIONAL_HEURISTIC",
             "ILLUSTRATIVE_PRACTICE_CHART_100BB_6MAX",
@@ -244,15 +244,15 @@ async def run_live_audit():
         )
 
         # Check ungraded row
-        assert (
-            ungraded_row["ev_loss"] is None
-        ), f"Ungraded ev_loss must be NULL, got {ungraded_row['ev_loss']}"
-        assert (
-            ungraded_row["chosen_ev"] is None
-        ), f"Ungraded chosen_ev must be NULL, got {ungraded_row['chosen_ev']}"
-        assert (
-            ungraded_row["best_ev"] is None
-        ), f"Ungraded best_ev must be NULL, got {ungraded_row['best_ev']}"
+        assert ungraded_row["ev_loss"] is None, (
+            f"Ungraded ev_loss must be NULL, got {ungraded_row['ev_loss']}"
+        )
+        assert ungraded_row["chosen_ev"] is None, (
+            f"Ungraded chosen_ev must be NULL, got {ungraded_row['chosen_ev']}"
+        )
+        assert ungraded_row["best_ev"] is None, (
+            f"Ungraded best_ev must be NULL, got {ungraded_row['best_ev']}"
+        )
         assert ungraded_row["grading_provenance"] == "SOLVER_DATA_UNAVAILABLE"
         print("  -> Verified: Ungraded row stores NULL for chosen_ev, best_ev, ev_loss.")
 
@@ -300,15 +300,15 @@ async def run_live_audit():
         assert status == 200
         assert len(list_b) >= 1
         item = list_b[0]
-        assert (
-            item["ev_loss"] is None
-        ), f"List API should return null ev_loss, got {item['ev_loss']}"
-        assert (
-            item["chosen_ev"] is None
-        ), f"List API should return null chosen_ev, got {item['chosen_ev']}"
-        assert (
-            item["best_ev"] is None
-        ), f"List API should return null best_ev, got {item['best_ev']}"
+        assert item["ev_loss"] is None, (
+            f"List API should return null ev_loss, got {item['ev_loss']}"
+        )
+        assert item["chosen_ev"] is None, (
+            f"List API should return null chosen_ev, got {item['chosen_ev']}"
+        )
+        assert item["best_ev"] is None, (
+            f"List API should return null best_ev, got {item['best_ev']}"
+        )
         assert item["grading_status"] == "PRACTICE"
         print("  -> Verified: GET /training/sessions/{id}/decisions preserves null semantics.")
 

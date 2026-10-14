@@ -174,9 +174,9 @@ class TestMLNumericalCertificationOracles:
             w_minus[j] -= eps
             num_grad_w = (compute_loss(w_plus, b) - compute_loss(w_minus, b)) / (2.0 * eps)
             rel_error = abs(grad_w[j] - num_grad_w) / (abs(grad_w[j]) + 1e-12)
-            assert (
-                rel_error < 1e-5
-            ), f"Gradient mismatch on w[{j}]: analytic={grad_w[j]}, num={num_grad_w}"
+            assert rel_error < 1e-5, (
+                f"Gradient mismatch on w[{j}]: analytic={grad_w[j]}, num={num_grad_w}"
+            )
 
         # Numerical gradient for bias
         num_grad_b = (compute_loss(w, b + eps) - compute_loss(w, b - eps)) / (2.0 * eps)

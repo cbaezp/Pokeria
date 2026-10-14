@@ -100,9 +100,9 @@ async def test_two_simultaneous_submissions(engine, profile_id):
     assert len(successes) == 1, f"Expected exactly 1 success, got {len(successes)}"
 
     assert len(failures) == 1, f"Expected exactly 1 rejection, got {len(failures)}"
-    assert isinstance(
-        failures[0], ValidationError
-    ), f"Expected ValidationError, got {type(failures[0])}"
+    assert isinstance(failures[0], ValidationError), (
+        f"Expected ValidationError, got {type(failures[0])}"
+    )
     print(f"Rejected error message: '{failures[0]}'")
 
     # Verify database state
@@ -111,9 +111,9 @@ async def test_two_simultaneous_submissions(engine, profile_id):
         decisions_count = await conn.fetchval(
             "SELECT count(*) FROM decision_events WHERE session_id = $1;", session_id
         )
-        assert (
-            decisions_count == 1
-        ), f"Expected exactly 1 row in decision_events, found {decisions_count}"
+        assert decisions_count == 1, (
+            f"Expected exactly 1 row in decision_events, found {decisions_count}"
+        )
 
         completed_count = await conn.fetchval(
             "SELECT completed_decisions FROM training_sessions WHERE id = $1;", session_id
@@ -339,9 +339,9 @@ async def test_pause_and_submission_racing(engine, profile_id):
         dec_count = await conn.fetchval(
             "SELECT count(*) FROM decision_events WHERE session_id = $1;", session_id
         )
-        assert (
-            completed == dec_count
-        ), f"Counter mismatch: completed={completed}, dec_count={dec_count}"
+        assert completed == dec_count, (
+            f"Counter mismatch: completed={completed}, dec_count={dec_count}"
+        )
         print(
             f"  -> Passed: Pause race resulted in consistent state (status={status}, decisions={dec_count})."
         )

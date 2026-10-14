@@ -77,18 +77,18 @@ async def verify_empty_to_head():
         print(f"Verified tables present: {table_names}")
         assert "training_sessions" in table_names, "training_sessions table missing"
         assert "decision_events" in table_names, "decision_events table missing"
-        assert (
-            "archived_duplicate_decision_events" in table_names
-        ), "archived_duplicate_decision_events missing"
+        assert "archived_duplicate_decision_events" in table_names, (
+            "archived_duplicate_decision_events missing"
+        )
 
         # Check unique constraint
         constraints = await conn.fetch("""
             SELECT conname FROM pg_constraint
             WHERE conname = 'uq_decision_events_session_scenario';
         """)
-        assert (
-            len(constraints) == 1
-        ), "Unique constraint uq_decision_events_session_scenario missing"
+        assert len(constraints) == 1, (
+            "Unique constraint uq_decision_events_session_scenario missing"
+        )
         print("Verified unique constraint uq_decision_events_session_scenario exists.")
 
         # Check ev_loss column nullable
@@ -96,9 +96,9 @@ async def verify_empty_to_head():
             SELECT is_nullable, data_type FROM information_schema.columns
             WHERE table_name = 'decision_events' AND column_name = 'ev_loss';
         """)
-        assert (
-            ev_col["is_nullable"] == "YES"
-        ), f"ev_loss should be nullable, got {ev_col['is_nullable']}"
+        assert ev_col["is_nullable"] == "YES", (
+            f"ev_loss should be nullable, got {ev_col['is_nullable']}"
+        )
         print(f"Verified ev_loss is nullable: {ev_col['is_nullable']} ({ev_col['data_type']})")
 
         # Check grading_status column exists
@@ -272,16 +272,16 @@ async def verify_0004_to_0005_with_duplicate_safety():
             "SELECT id, ev_loss, grading_status FROM decision_events WHERE session_id = $1;",
             session_id,
         )
-        assert (
-            len(remaining) == 1
-        ), f"Expected exactly 1 canonical decision remaining, got {len(remaining)}"
+        assert len(remaining) == 1, (
+            f"Expected exactly 1 canonical decision remaining, got {len(remaining)}"
+        )
         assert remaining[0]["id"] == dec1_id, "Canonical decision should be the earliest record"
-        assert (
-            remaining[0]["ev_loss"] is None
-        ), f"Expected ev_loss to be updated to NULL for illustrative preflop chart, got {remaining[0]['ev_loss']}"
-        assert (
-            remaining[0]["grading_status"] == "PRACTICE"
-        ), f"Expected grading_status 'PRACTICE', got {remaining[0]['grading_status']}"
+        assert remaining[0]["ev_loss"] is None, (
+            f"Expected ev_loss to be updated to NULL for illustrative preflop chart, got {remaining[0]['ev_loss']}"
+        )
+        assert remaining[0]["grading_status"] == "PRACTICE", (
+            f"Expected grading_status 'PRACTICE', got {remaining[0]['grading_status']}"
+        )
         print(
             "Verified canonical decision retained with NULL ev_loss and 'PRACTICE' grading_status."
         )
@@ -293,9 +293,9 @@ async def verify_0004_to_0005_with_duplicate_safety():
         )
         assert len(archived) == 2, f"Expected 2 archived duplicate rows, found {len(archived)}"
         archived_ids = [r["id"] for r in archived]
-        assert (
-            dec2_id in archived_ids and dec3_id in archived_ids
-        ), "Archived rows do not match original duplicates"
+        assert dec2_id in archived_ids and dec3_id in archived_ids, (
+            "Archived rows do not match original duplicates"
+        )
         print(f"Verified {len(archived)} duplicate rows safely archived without data loss.")
 
         # Verify unique constraint prevents new duplicate insertion

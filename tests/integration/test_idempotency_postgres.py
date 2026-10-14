@@ -453,19 +453,19 @@ async def test_8_grading_and_performance_isolation(
 
     # Preflop illustrative spots MUST NOT generate fabricated solver EV or regret
     if preflop_data["grading_provenance"] == "ILLUSTRATIVE_PRACTICE_CHART_100BB_6MAX":
-        assert (
-            preflop_data["raw_ev_loss"] is None
-        ), "Illustrative chart must not fabricate raw_ev_loss"
-        assert (
-            preflop_data["chosen_action_ev"] is None
-        ), "Illustrative chart must not fabricate chosen_action_ev"
-        assert (
-            preflop_data["best_action_ev"] is None
-        ), "Illustrative chart must not fabricate best_action_ev"
+        assert preflop_data["raw_ev_loss"] is None, (
+            "Illustrative chart must not fabricate raw_ev_loss"
+        )
+        assert preflop_data["chosen_action_ev"] is None, (
+            "Illustrative chart must not fabricate chosen_action_ev"
+        )
+        assert preflop_data["best_action_ev"] is None, (
+            "Illustrative chart must not fabricate best_action_ev"
+        )
         for ref in preflop_data["reference_actions"]:
-            assert (
-                ref["action_ev"] is None
-            ), f"Illustrative preflop action {ref['action']} must not fabricate action_ev"
+            assert ref["action_ev"] is None, (
+                f"Illustrative preflop action {ref['action']} must not fabricate action_ev"
+            )
         assert preflop_data["grading_status"] == "PRACTICE"
         assert (
             "drill" in preflop_data["solution_quality_note"].lower()

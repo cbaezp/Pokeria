@@ -126,9 +126,9 @@ async def verify_post_restart(profile_id: str, session_id: str, scenario_id: str
             "PAUSED",
             "ACTIVE",
         ), f"Session status was {sess_row['status']}"
-        assert (
-            sess_row["completed_decisions"] == 1
-        ), f"Completed decisions was {sess_row['completed_decisions']}, expected 1"
+        assert sess_row["completed_decisions"] == 1, (
+            f"Completed decisions was {sess_row['completed_decisions']}, expected 1"
+        )
         print(
             f"    DB Session Verified: id={sess_row['id']}, status={sess_row['status']}, completed={sess_row['completed_decisions']}"
         )
@@ -139,9 +139,9 @@ async def verify_post_restart(profile_id: str, session_id: str, scenario_id: str
             session_id,
         )
         assert event_row is not None, "Decision event missing after restart!"
-        assert (
-            event_row["scenario_id"] == scenario_id
-        ), f"Scenario id mismatch: {event_row['scenario_id']} vs {scenario_id}"
+        assert event_row["scenario_id"] == scenario_id, (
+            f"Scenario id mismatch: {event_row['scenario_id']} vs {scenario_id}"
+        )
         print(
             f"    DB Decision Event Verified: id={event_row['id']}, scenario_id={event_row['scenario_id']}, chosen_action={event_row['chosen_action']}, status={event_row['grading_status']}, provenance={event_row['grading_provenance']}"
         )
@@ -152,9 +152,9 @@ async def verify_post_restart(profile_id: str, session_id: str, scenario_id: str
             WHERE conrelid = 'decision_events'::regclass AND contype = 'u';
         """)
         constraint_names = [r["conname"] for r in constraints]
-        assert (
-            "uq_decision_events_session_scenario" in constraint_names
-        ), f"Unique constraint missing: {constraint_names}"
+        assert "uq_decision_events_session_scenario" in constraint_names, (
+            f"Unique constraint missing: {constraint_names}"
+        )
         print(f"    DB Schema Constraints Verified: {constraint_names}")
     finally:
         await conn.close()

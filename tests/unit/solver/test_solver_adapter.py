@@ -232,9 +232,9 @@ class TestSolverAdapterUnit:
             assert computed_checksum == pack["artifact_checksum"]
 
             # 2. Verify exploitability threshold <= 0.5% (strictly validated)
-            assert (
-                pack["exploitability_pct_of_pot"] <= 0.5
-            ), f"{pack['name']} exploitability {pack['exploitability_pct_of_pot']}% > 0.5%"
+            assert pack["exploitability_pct_of_pot"] <= 0.5, (
+                f"{pack['name']} exploitability {pack['exploitability_pct_of_pot']}% > 0.5%"
+            )
             assert pack["validation_status"] == "VALIDATED"
 
             # 3. Verify action EVs and node EV are present and match identity

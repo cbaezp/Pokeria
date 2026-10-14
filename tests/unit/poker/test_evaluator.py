@@ -149,9 +149,9 @@ class TestHandEvaluator:
                     f"B: {[str(c) for c in full_b]} ({strength_b.description})"
                 )
             elif score_a > score_b:
-                assert (
-                    strength_a < strength_b
-                ), f"Disagreement: Treys says B ({score_b}) > A ({score_a}), but our evaluator disagrees!"
+                assert strength_a < strength_b, (
+                    f"Disagreement: Treys says B ({score_b}) > A ({score_a}), but our evaluator disagrees!"
+                )
             else:
                 assert strength_a == strength_b, "Disagreement on tied hand scores!"
 
