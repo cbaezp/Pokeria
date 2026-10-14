@@ -42,9 +42,9 @@ Whenever adding a new exercise to Math Lab (`apps/api/app/domain/math_lab/`) or 
        step_by_step_solution=[
            "1. Total pot after opponent bet = 100 + 50 = 150 chips.",
            "2. Total pot if you call = 150 + 50 = 200 chips.",
-           "3. Required equity = Call / (Pot + Call) = 50 / 200 = 25.0%."
+           "3. Required equity = Call / (Pot + Call) = 50 / 200 = 25.0%.",
        ],
-       reference_formula="C / (P + C)"
+       reference_formula="C / (P + C)",
    )
    ```
 

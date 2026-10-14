@@ -12,7 +12,7 @@
     "dev": "next dev -p ${PORT:-3011}",
     "build": "next build",
     "start": "next start --port 3000",
-    "lint": "next lint",
+    "lint": "biome check --diagnostic-level=error .",
     "check": "biome check .",
     "format": "biome format --write .",
     "test": "vitest run",

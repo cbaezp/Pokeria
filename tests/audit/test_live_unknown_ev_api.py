@@ -114,9 +114,9 @@ async def run_live_audit():
     )
 
     assert eval_a["grading_status"] == "GRADED"
-    assert isinstance(eval_a["raw_ev_loss"], (int, float))
-    assert isinstance(eval_a["chosen_action_ev"], (int, float))
-    assert isinstance(eval_a["best_action_ev"], (int, float))
+    assert isinstance(eval_a["raw_ev_loss"], int | float)
+    assert isinstance(eval_a["chosen_action_ev"], int | float)
+    assert isinstance(eval_a["best_action_ev"], int | float)
     print("  -> Passed: Live API returns numeric EV for solver-backed spot.")
 
     # 3. Test Case B: Illustrative Preflop Chart Decision without Solver EV

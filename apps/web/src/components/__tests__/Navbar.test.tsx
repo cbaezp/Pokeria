@@ -24,11 +24,9 @@ describe("Navbar", () => {
 
     expect(screen.getByText("POKERIA")).toBeInTheDocument();
     expect(screen.getByText("Overview")).toBeInTheDocument();
-    expect(screen.getByText("Practice")).toBeInTheDocument();
-    expect(screen.getByText("Strategy Library")).toBeInTheDocument();
-    expect(screen.getByText("Review")).toBeInTheDocument();
-    expect(screen.getByText("Performance")).toBeInTheDocument();
-    expect(screen.getByText("Simulate")).toBeInTheDocument();
+    expect(screen.getByText("Learn & Train")).toBeInTheDocument();
+    expect(screen.getByText("Play & Analyze")).toBeInTheDocument();
+    expect(screen.getByText("My Progress")).toBeInTheDocument();
   });
 
   it("renders theme toggle button with accessible label", () => {

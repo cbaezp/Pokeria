@@ -242,7 +242,7 @@ class MathLabService:
         signed_bias = 0.0
         mistake_cat: MistakeClassification | None = None
 
-        if isinstance(exact, (int, float)):
+        if isinstance(exact, int | float):
             try:
                 num_student = float(student_answer)
                 abs_err = abs(num_student - float(exact))

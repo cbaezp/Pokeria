@@ -96,7 +96,7 @@ class SpeedTrainerEngine:
 
             # Ensure answer is numeric or options exist
             numeric_target = (
-                float(ex.exact_answer) if isinstance(ex.exact_answer, (int, float)) else 0.0
+                float(ex.exact_answer) if isinstance(ex.exact_answer, int | float) else 0.0
             )
 
             items.append(
